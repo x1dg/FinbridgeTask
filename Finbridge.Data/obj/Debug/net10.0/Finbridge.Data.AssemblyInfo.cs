@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Finbridge.Data")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c36898bb85b8e65fd0655fca0435d4f28dfbdb39")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a69aed6a970dd67a98700e9efda7e6fbb43de03")]
 [assembly: System.Reflection.AssemblyProductAttribute("Finbridge.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Finbridge.Data")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

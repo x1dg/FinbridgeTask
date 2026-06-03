@@ -24,6 +24,10 @@ namespace Finbridge.Data
                 entity.Property(e => e.PlaceOfBirth)
                     .IsRequired()
                     .HasMaxLength(200);
+
+                entity.Property(e => e.Version)
+                    .IsRequired()
+                    .IsConcurrencyToken();
             });
 
             modelBuilder.Entity<BalanceHistory>(entity =>

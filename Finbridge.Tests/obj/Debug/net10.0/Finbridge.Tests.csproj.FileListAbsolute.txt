@@ -146,3 +146,5 @@ C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\obj\Debug\net10.0\refint\Fi
 C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\obj\Debug\net10.0\Finbridge.Tests.pdb
 C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\obj\Debug\net10.0\Finbridge.Tests.genruntimeconfig.cache
 C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\obj\Debug\net10.0\ref\Finbridge.Tests.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\bin\Debug\net10.0\Castle.Core.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Tests\bin\Debug\net10.0\Moq.dll

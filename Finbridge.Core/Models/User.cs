@@ -10,6 +10,7 @@ namespace Finbridge.Core.Models
         public DateTime DateOfBirth { get; set; }
         public string PlaceOfBirth { get; set; } = string.Empty;
         public decimal Balance { get; set; }
+        public int Version { get; set; } // For optimistic locking
         public List<BalanceHistory> BalanceHistory { get; set; } = new List<BalanceHistory>();
     }
 }
