@@ -1,0 +1,6 @@
+@Finbridge.Api_HostAddress = http://localhost:5109
+
+GET {{Finbridge.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

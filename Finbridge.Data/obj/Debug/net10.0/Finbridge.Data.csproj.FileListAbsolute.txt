@@ -1,0 +1,15 @@
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\bin\Debug\net10.0\Finbridge.Data.deps.json
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\bin\Debug\net10.0\Finbridge.Data.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\bin\Debug\net10.0\Finbridge.Data.pdb
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\bin\Debug\net10.0\Finbridge.Core.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\bin\Debug\net10.0\Finbridge.Core.pdb
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.csproj.AssemblyReference.cache
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.AssemblyInfoInputs.cache
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.AssemblyInfo.cs
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.csproj.CoreCompileInputs.cache
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridg.C1C51BD5.Up2Date
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\refint\Finbridge.Data.dll
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\Finbridge.Data.pdb
+C:\Users\danil\Desktop\FinbridgeTask\Finbridge.Data\obj\Debug\net10.0\ref\Finbridge.Data.dll

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Finbridge.Api/Finbridge.Api.csproj" />
+  <Project Path="Finbridge.Core/Finbridge.Core.csproj" />
+  <Project Path="Finbridge.Data/Finbridge.Data.csproj" />
+</Solution>
