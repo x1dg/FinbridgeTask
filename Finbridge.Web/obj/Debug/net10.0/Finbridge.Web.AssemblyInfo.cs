@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Finbridge.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c36898bb85b8e65fd0655fca0435d4f28dfbdb39")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8420239ab948e7b4d86ced929dcfa0e68af4b352")]
 [assembly: System.Reflection.AssemblyProductAttribute("Finbridge.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Finbridge.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

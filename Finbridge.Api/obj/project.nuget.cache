@@ -1,12 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "g4c/TmWvtdE=",
+  "dgSpecHash": "7ydDLbg2wPY=",
   "success": true,
   "projectFilePath": "C:\\Users\\danil\\Desktop\\FinbridgeTask\\Finbridge.Api\\Finbridge.Api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\danil\\.nuget\\packages\\confluent.kafka\\2.14.2\\confluent.kafka.2.14.2.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\librdkafka.redist\\2.14.2\\librdkafka.redist.2.14.2.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.8\\microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
+    "C:\\Users\\danil\\.nuget\\packages\\microsoft.aspnetcore.ratelimiting\\7.0.0-rc.2.22476.2\\microsoft.aspnetcore.ratelimiting.7.0.0-rc.2.22476.2.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.8\\microsoft.entityframeworkcore.10.0.8.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.8\\microsoft.entityframeworkcore.abstractions.10.0.8.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.8\\microsoft.entityframeworkcore.analyzers.10.0.8.nupkg.sha512",
@@ -20,5 +21,18 @@
     "C:\\Users\\danil\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\10.2.1\\swashbuckle.aspnetcore.swaggergen.10.2.1.nupkg.sha512",
     "C:\\Users\\danil\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\10.2.1\\swashbuckle.aspnetcore.swaggerui.10.2.1.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.AspNetCore.RateLimiting не будет урезано. Рассмотрите возможность удаления этого пакета из зависимостей, так как он, вероятно, не требуется.",
+      "projectPath": "C:\\Users\\danil\\Desktop\\FinbridgeTask\\Finbridge.Api\\Finbridge.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\danil\\Desktop\\FinbridgeTask\\Finbridge.Api\\Finbridge.Api.csproj",
+      "libraryId": "Microsoft.AspNetCore.RateLimiting",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

@@ -152,6 +152,22 @@
           "build/Microsoft.AspNetCore.OpenApi.targets": {}
         }
       },
+      "Microsoft.AspNetCore.RateLimiting/7.0.0-rc.2.22476.2": {
+        "type": "package",
+        "compile": {
+          "lib/net7.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net7.0/_._": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.EntityFrameworkCore/10.0.8": {
         "type": "package",
         "dependencies": {
@@ -439,6 +455,21 @@
         "lib/net10.0/Microsoft.AspNetCore.OpenApi.xml",
         "microsoft.aspnetcore.openapi.10.0.8.nupkg.sha512",
         "microsoft.aspnetcore.openapi.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.RateLimiting/7.0.0-rc.2.22476.2": {
+      "sha512": "k3SEHb6sqJE4c4mOxgxhJGD05WoXYRcobZJYgVW8YFDkPf1x418ys8KoMIlsCuqDeiMy7ro54Vn9g36PcVORNQ==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.ratelimiting/7.0.0-rc.2.22476.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net7.0/Microsoft.AspNetCore.RateLimiting.dll",
+        "lib/net7.0/Microsoft.AspNetCore.RateLimiting.xml",
+        "microsoft.aspnetcore.ratelimiting.7.0.0-rc.2.22476.2.nupkg.sha512",
+        "microsoft.aspnetcore.ratelimiting.nuspec"
       ]
     },
     "Microsoft.EntityFrameworkCore/10.0.8": {
@@ -907,6 +938,7 @@
       "Finbridge.Core >= 1.0.0",
       "Finbridge.Data >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 10.0.8",
+      "Microsoft.AspNetCore.RateLimiting >= 7.0.0-rc.2.22476.2",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 10.0.2",
       "Swashbuckle.AspNetCore >= 10.2.1"
     ]
@@ -973,6 +1005,10 @@
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.8, )"
+          },
+          "Microsoft.AspNetCore.RateLimiting": {
+            "target": "Package",
+            "version": "[7.0.0-rc.2.22476.2, )"
           },
           "Npgsql.EntityFrameworkCore.PostgreSQL": {
             "target": "Package",
@@ -1419,5 +1455,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "PackageReference Microsoft.AspNetCore.RateLimiting не будет урезано. Рассмотрите возможность удаления этого пакета из зависимостей, так как он, вероятно, не требуется.",
+      "libraryId": "Microsoft.AspNetCore.RateLimiting",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }
