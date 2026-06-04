@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[10.0.8, )"
             },
+            "Microsoft.AspNetCore.RateLimiting": {
+              "target": "Package",
+              "version": "[7.0.0-rc.2.22476.2, )"
+            },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
               "version": "[10.0.2, )"
