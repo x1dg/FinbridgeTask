@@ -8,7 +8,7 @@ public sealed class NegativeBalanceException : DomainException
     public Money AttemptedBalance { get; }
 
     public NegativeBalanceException(Money attemptedBalance)
-        : base($"Operation would result in a negative balance ({attemptedBalance}).")
+        : base($"Операция привела бы к отрицательному балансу ({attemptedBalance}).")
     {
         AttemptedBalance = attemptedBalance;
     }

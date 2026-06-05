@@ -7,10 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbridge.Api.Middleware;
 
-/// <summary>
-/// Глобальный обработчик исключений. Транслирует доменные исключения
-/// в HTTP-коды, всё остальное уходит в 500.
-/// </summary>
 public sealed class ExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;
@@ -35,7 +31,7 @@ public sealed class ExceptionHandlingMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception while executing the request.");
+            _logger.LogError(ex, "Необработанное исключение при выполнении запроса.");
             await HandleExceptionAsync(context, ex);
         }
     }

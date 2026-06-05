@@ -65,19 +65,19 @@ builder.Services.AddResiliencePipeline(ResiliencePipelines.KafkaProducer, (pipel
             {
                 logger.LogError(
                     args.Outcome.Exception,
-                    "Kafka circuit breaker OPENED for {BreakDurationSeconds}s. Last failure: {ExceptionType}.",
+                    "Circuit breaker ОТКРЫТ на {BreakDurationSeconds}с. Последняя ошибка: {ExceptionType}.",
                     args.BreakDuration.TotalSeconds,
                     args.Outcome.Exception?.GetType().Name ?? "n/a");
                 return ValueTask.CompletedTask;
             },
             OnClosed = args =>
             {
-                logger.LogInformation("Kafka circuit breaker CLOSED — producer is healthy again.");
+                logger.LogInformation("Circuit breaker ЗАКРЫТ — продюсер снова работает.");
                 return ValueTask.CompletedTask;
             },
             OnHalfOpened = args =>
             {
-                logger.LogWarning("Kafka circuit breaker HALF-OPEN — probing producer with next call.");
+                logger.LogWarning("Circuit breaker ПОЛУОТКРЫТ — пробуем продюсер следующим вызовом.");
                 return ValueTask.CompletedTask;
             },
         })

@@ -1,9 +1,5 @@
 namespace Finbridge.Domain.Common;
 
-/// <summary>
-/// База для значимого объекта (Value Object). Равенство определяется
-/// набором компонентов, а не идентичностью. Неизменяем.
-/// </summary>
 public abstract class ValueObject
 {
     protected abstract IEnumerable<object?> GetEqualityComponents();

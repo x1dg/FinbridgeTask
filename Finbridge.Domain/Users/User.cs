@@ -6,21 +6,12 @@ using Finbridge.Domain.Users.ValueObjects;
 
 namespace Finbridge.Domain.Users;
 
-/// <summary>
-/// Агрегатный корень: Пользователь. Владеет своим балансом и историей его изменений.
-/// Все инварианты (неотрицательность, лимит, аудит) соблюдаются здесь, а не в сервисах.
-/// </summary>
 public sealed class User : AggregateRoot<int>
 {
     public FullName FullName { get; private set; } = null!;
     public DateTime DateOfBirth { get; private set; }
     public string PlaceOfBirth { get; private set; } = string.Empty;
     public Money Balance { get; private set; } = Money.Zero;
-
-    /// <summary>
-    /// Версия для оптимистичной блокировки. Инкрементируется при любом
-    /// мутирующем действии агрегата.
-    /// </summary>
     public uint Version { get; private set; }
 
     private readonly List<BalanceHistory> _history = new();
@@ -33,12 +24,12 @@ public sealed class User : AggregateRoot<int>
     {
         if (string.IsNullOrWhiteSpace(placeOfBirth))
         {
-            throw new ArgumentException("Place of birth cannot be empty.", nameof(placeOfBirth));
+            throw new ArgumentException("Место рождения не может быть пустым.", nameof(placeOfBirth));
         }
 
         if (dateOfBirth > DateTime.UtcNow)
         {
-            throw new ArgumentException("Date of birth cannot be in the future.", nameof(dateOfBirth));
+            throw new ArgumentException("Дата рождения не может быть в будущем.", nameof(dateOfBirth));
         }
 
         return new User
@@ -51,10 +42,6 @@ public sealed class User : AggregateRoot<int>
         };
     }
 
-    /// <summary>
-    /// Применяет дельту к балансу. Соблюдает инварианты, фиксирует запись в истории,
-    /// инкрементирует Version и поднимает BalanceUpdatedDomainEvent.
-    /// </summary>
     public void UpdateBalance(Money delta, Money maxBalance, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(delta);

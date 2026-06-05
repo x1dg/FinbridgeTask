@@ -7,7 +7,7 @@ public sealed class UserNotFoundException : DomainException
     public int UserId { get; }
 
     public UserNotFoundException(int userId)
-        : base($"User with id {userId} was not found.")
+        : base($"Пользователь с id {userId} не найден.")
     {
         UserId = userId;
     }

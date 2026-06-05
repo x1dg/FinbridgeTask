@@ -5,10 +5,6 @@ using Finbridge.Domain.Users.Events;
 
 namespace Finbridge.Api.Events;
 
-/// <summary>
-/// In-process обработчик доменного события <see cref="BalanceUpdatedDomainEvent"/>:
-/// сериализует событие в JSON и публикует в Kafka-топик.
-/// </summary>
 public sealed class BalanceUpdatedKafkaHandler : IDomainEventHandler<BalanceUpdatedDomainEvent>
 {
     private readonly IKafkaProducer _producer;
@@ -46,7 +42,7 @@ public sealed class BalanceUpdatedKafkaHandler : IDomainEventHandler<BalanceUpda
         catch (Exception ex)
         {
             _logger.LogError(ex,
-                "Failed to publish BalanceUpdated event for user {UserId} to topic {Topic}.",
+                "Не удалось опубликовать событие BalanceUpdated для пользователя {UserId} в топик {Topic}.",
                 domainEvent.UserId, _settings.Topic);
             throw;
         }

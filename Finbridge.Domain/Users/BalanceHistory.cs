@@ -3,11 +3,6 @@ using Finbridge.Domain.Users.ValueObjects;
 
 namespace Finbridge.Domain.Users;
 
-/// <summary>
-/// Запись в истории баланса — дочерняя сущность агрегата User.
-/// Не имеет собственного глобального идентификатора, идентифицируется
-/// своим положением внутри агрегата (Id назначается БД при сохранении).
-/// </summary>
 public sealed class BalanceHistory : Entity
 {
     public int UserId { get; private set; }

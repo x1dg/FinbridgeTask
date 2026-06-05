@@ -54,7 +54,7 @@ public sealed class BalanceService : IBalanceService
                 }
 
                 _logger.LogWarning(
-                    "Concurrency conflict on balance update for user {UserId} (attempt {Attempt}/{Max}), retrying.",
+                    "Конфликт оптимистичной блокировки при обновлении баланса пользователя {UserId} (попытка {Attempt}/{Max}), повтор.",
                     request.UserId, attempt + 1, MaxRetryAttempts);
                 continue;
             }
@@ -70,11 +70,6 @@ public sealed class BalanceService : IBalanceService
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        // В рамках одного батча каждое обновление независимо и оптимистично-блокируемо.
-        // Доменный инвариант о транзакционности (consistency) для батча в DDD обычно
-        // решается через Saga/ProcessManager; здесь для простоты применяем последовательно.
-        // Если в середине батча упадём — уже применённые обновления остаются,
-        // а оставшиеся не применяются, что соответствует семантике исходного кода.
         foreach (var update in request.Updates)
         {
             await UpdateBalanceAsync(update, cancellationToken);

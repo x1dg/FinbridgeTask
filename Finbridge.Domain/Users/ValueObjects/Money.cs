@@ -2,10 +2,6 @@ using Finbridge.Domain.Common;
 
 namespace Finbridge.Domain.Users.ValueObjects;
 
-/// <summary>
-/// Деньги. Положительная десятичная дробь с фиксированной точностью.
-/// Инварианты: amount >= 0; не NaN/Infinity; точность — 2 знака после запятой.
-/// </summary>
 public sealed class Money : ValueObject
 {
     public decimal Amount { get; }
@@ -21,16 +17,12 @@ public sealed class Money : ValueObject
     {
         if (amount < 0m)
         {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Money amount cannot be negative.");
+            throw new ArgumentOutOfRangeException(nameof(amount), "Сумма не может быть отрицательной.");
         }
 
         return new Money(amount);
     }
 
-    /// <summary>
-    /// Дельта, которая может быть и положительной, и отрицательной (например, при изменении баланса).
-    /// Используется ТОЛЬКО для арифметики, не для хранения.
-    /// </summary>
     public static Money DeltaOf(decimal amount) => new(Math.Round(amount, 2, MidpointRounding.ToEven));
 
     public bool IsZero => Amount == 0m;
@@ -43,7 +35,7 @@ public sealed class Money : ValueObject
         var result = left.Amount - right.Amount;
         if (result < 0m)
         {
-            throw new InvalidOperationException("Money subtraction would produce a negative value.");
+            throw new InvalidOperationException("Вычитание приведёт к отрицательному значению.");
         }
         return new Money(result);
     }

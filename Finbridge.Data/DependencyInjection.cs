@@ -7,9 +7,6 @@ namespace Finbridge.Data;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Регистрирует инфраструктурный слой: EF Core DbContext и репозитории.
-    /// </summary>
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         string connectionString)

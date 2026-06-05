@@ -2,9 +2,6 @@ using Finbridge.Domain.Common;
 
 namespace Finbridge.Domain.Users.ValueObjects;
 
-/// <summary>
-/// Полное имя пользователя. Не пустое, обрезается, ограничено 200 символами.
-/// </summary>
 public sealed class FullName : ValueObject
 {
     public string Value { get; }
@@ -20,13 +17,13 @@ public sealed class FullName : ValueObject
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new ArgumentException("Full name cannot be null or empty.", nameof(value));
+            throw new ArgumentException("Полное имя не может быть пустым.", nameof(value));
         }
 
         var trimmed = value.Trim();
         if (trimmed.Length > MaxLength)
         {
-            throw new ArgumentException($"Full name length cannot exceed {MaxLength} characters.", nameof(value));
+            throw new ArgumentException($"Длина полного имени не может превышать {MaxLength} символов.", nameof(value));
         }
 
         return new FullName(trimmed);

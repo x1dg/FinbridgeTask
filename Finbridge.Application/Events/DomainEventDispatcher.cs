@@ -4,11 +4,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Finbridge.Application.Events;
 
-/// <summary>
-/// Application-уровень диспетчера. Маршрутизирует доменные события
-/// к зарегистрированным in-process обработчикам. Конкретные обработчики
-/// (Kafka, логи, метрики) поставляются внешними слоями.
-/// </summary>
 public sealed class DomainEventDispatcher : IDomainEventDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
@@ -28,7 +23,7 @@ public sealed class DomainEventDispatcher : IDomainEventDispatcher
         if (!handlers.Any())
         {
             _logger.LogDebug(
-                "No handlers registered for domain event {EventType}.",
+                "Нет обработчиков для доменного события {EventType}.",
                 domainEvent.GetType().Name);
             return;
         }

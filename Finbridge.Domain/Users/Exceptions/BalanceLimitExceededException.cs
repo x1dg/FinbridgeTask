@@ -9,7 +9,7 @@ public sealed class BalanceLimitExceededException : DomainException
     public Money MaxBalance { get; }
 
     public BalanceLimitExceededException(Money attemptedBalance, Money maxBalance)
-        : base($"Balance {attemptedBalance} would exceed the maximum allowed value of {maxBalance}.")
+        : base($"Баланс {attemptedBalance} превысил бы максимально допустимое значение {maxBalance}.")
     {
         AttemptedBalance = attemptedBalance;
         MaxBalance = maxBalance;

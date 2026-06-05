@@ -7,11 +7,6 @@ namespace Finbridge.Application;
 
 public static class DependencyInjection
 {
-    /// <summary>
-    /// Регистрирует Application-слой: сервисы и диспетчер доменных событий.
-    /// Доменные политики (<see cref="BalanceSettings"/>) биндятся вызывающим
-    /// кодом через <c>services.Configure&lt;BalanceSettings&gt;(...)</c>.
-    /// </summary>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();

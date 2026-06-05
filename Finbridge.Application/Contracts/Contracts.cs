@@ -2,9 +2,6 @@ using Finbridge.Domain.Users.ValueObjects;
 
 namespace Finbridge.Application.Contracts;
 
-/// <summary>
-/// Запрос на создание пользователя. Контракт между Presentation и Application.
-/// </summary>
 public sealed record CreateUserRequest(
     string FullName,
     DateTime DateOfBirth,
@@ -17,10 +14,6 @@ public sealed record UpdateBalanceRequest(
 public sealed record BatchUpdateBalancesRequest(
     IReadOnlyList<UpdateBalanceRequest> Updates);
 
-/// <summary>
-/// Ответы, которые Application отдаёт Presentation. Содержат ровно те поля,
-/// которые нужны клиенту; доменный User не утекает наружу.
-/// </summary>
 public sealed record UserResponse(
     int Id,
     string FullName,
