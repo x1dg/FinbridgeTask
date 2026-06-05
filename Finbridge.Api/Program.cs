@@ -1,15 +1,13 @@
 using System.Net.Sockets;
 using System.Threading.RateLimiting;
 using Confluent.Kafka;
-using Finbridge.Api.Events;
 using Finbridge.Api.Middleware;
+using Finbridge.Api.Outbox;
 using Finbridge.Api.Resilience;
 using Finbridge.Api.Services;
 using Finbridge.Application;
-using Finbridge.Application.Events;
 using Finbridge.Application.Services;
 using Finbridge.Data;
-using Finbridge.Domain.Users.Events;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -104,7 +102,8 @@ builder.Services.AddScoped<IKafkaProducer>(sp =>
         sp.GetRequiredService<KafkaProducer>(),
         sp.GetRequiredService<ResiliencePipelineProvider<string>>()));
 
-builder.Services.AddScoped<IDomainEventHandler<BalanceUpdatedDomainEvent>, BalanceUpdatedKafkaHandler>();
+builder.Services.AddScoped<IOutboxPublisher, BalanceUpdatedOutboxPublisher>();
+builder.Services.AddHostedService<OutboxRelayService>();
 
 builder.Services.AddApplication();
 

@@ -1,3 +1,4 @@
+using Finbridge.Data.Interceptors;
 using Finbridge.Data.Repositories;
 using Finbridge.Domain.Users.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,17 @@ public static class DependencyInjection
         this IServiceCollection services,
         string connectionString)
     {
-        services.AddDbContext<FinbridgeDbContext>(options =>
+        services.AddScoped<OutboxSaveChangesInterceptor>();
+
+        services.AddDbContext<FinbridgeDbContext>((sp, options) =>
+        {
             options.UseNpgsql(connectionString, npgsql =>
                 npgsql.EnableRetryOnFailure(
                     maxRetryCount: 3,
                     maxRetryDelay: TimeSpan.FromSeconds(5),
-                    errorCodesToAdd: null)));
+                    errorCodesToAdd: null));
+            options.AddInterceptors(sp.GetRequiredService<OutboxSaveChangesInterceptor>());
+        });
 
         services.AddScoped<IUserRepository, UserRepository>();
         return services;

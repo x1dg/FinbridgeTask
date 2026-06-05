@@ -1,8 +1,8 @@
 using Finbridge.Application.Contracts;
 using Finbridge.Application.Services;
 using Finbridge.Data;
+using Finbridge.Data.Interceptors;
 using Finbridge.Data.Repositories;
-using Finbridge.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbridge.Tests.Application;
@@ -14,14 +14,14 @@ public class UserServiceTests
         var dbName = $"UserServiceTestDb_{Guid.NewGuid():N}";
         var options = new DbContextOptionsBuilder<FinbridgeDbContext>()
             .UseInMemoryDatabase(dbName)
+            .AddInterceptors(new OutboxSaveChangesInterceptor())
             .Options;
         var ctx = new FinbridgeDbContext(options);
         ctx.Database.EnsureDeleted();
         ctx.Database.EnsureCreated();
 
         var repo = new UserRepository(ctx);
-        var dispatcher = new NoopDispatcher();
-        return (new UserService(repo, dispatcher), ctx);
+        return (new UserService(repo), ctx);
     }
 
     [Fact]
@@ -64,11 +64,5 @@ public class UserServiceTests
 
         var users = await svc.GetAllAsync();
         Assert.Equal(2, users.Count);
-    }
-
-    private sealed class NoopDispatcher : IDomainEventDispatcher
-    {
-        public Task DispatchAsync(IDomainEvent domainEvent, CancellationToken cancellationToken = default) =>
-            Task.CompletedTask;
     }
 }
