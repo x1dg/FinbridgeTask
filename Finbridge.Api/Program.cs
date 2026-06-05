@@ -1,4 +1,5 @@
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.RateLimiting;
 using Confluent.Kafka;
 using Finbridge.Api.HealthChecks;
@@ -9,8 +10,11 @@ using Finbridge.Api.Services;
 using Finbridge.Application;
 using Finbridge.Application.Configuration;
 using Finbridge.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.RateLimiting;
@@ -21,11 +25,46 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization. Введите только токен (без 'Bearer ').",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+    c.AddSecurityRequirement(_ => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", null)] = new List<string>()
+    });
+});
 
 builder.Services.Configure<BalanceSettings>(builder.Configuration.GetSection("BalanceSettings"));
 builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("KafkaSettings"));
 builder.Services.Configure<KafkaResilienceOptions>(builder.Configuration.GetSection("KafkaResilience"));
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>() ?? new JwtSettings();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey)),
+            ClockSkew = TimeSpan.FromMinutes(1)
+        };
+    });
+builder.Services.AddAuthorization();
 
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
@@ -139,6 +178,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandling();
 app.UseRateLimiter();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {

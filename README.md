@@ -26,18 +26,19 @@ dotnet test Finbridge.slnx
 
 ## API
 
-| Метод | Путь | Описание |
-|-------|------|----------|
-| `POST` | `/api/users` | Создать пользователя |
-| `GET`  | `/api/users/{id}` | Получить пользователя |
-| `GET`  | `/api/users` | Список пользователей |
-| `POST` | `/api/balances` | Обновить баланс |
-| `POST` | `/api/balances/batch` | Пакетное обновление |
-| `GET`  | `/api/balances/history/{userId}` | История баланса (последние 20) |
-| `GET`  | `/health/live` | Liveness (всегда 200 если процесс жив) |
-| `GET`  | `/health/ready` | Readiness (Postgres + Kafka + outbox) |
+| Метод | Путь | Описание | Авторизация |
+|-------|------|----------|-------------|
+| `POST` | `/api/auth/token` | Получить JWT (dev) | — |
+| `POST` | `/api/users` | Создать пользователя | Bearer |
+| `GET`  | `/api/users/{id}` | Получить пользователя | Bearer |
+| `GET`  | `/api/users` | Список пользователей | Bearer |
+| `POST` | `/api/balances` | Обновить баланс | Bearer |
+| `POST` | `/api/balances/batch` | Пакетное обновление | Bearer |
+| `GET`  | `/api/balances/history/{userId}` | История баланса (последние 20) | Bearer |
+| `GET`  | `/health/live` | Liveness (всегда 200 если процесс жив) | — |
+| `GET`  | `/health/ready` | Readiness (Postgres + Kafka + outbox) | — |
 
-Swagger: `http://localhost:8080/swagger`.
+Swagger: `http://localhost:8080/swagger` (кнопка "Authorize" принимает токен из `/api/auth/token`).
 
 ## Архитектура
 

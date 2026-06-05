@@ -1,10 +1,12 @@
 using Finbridge.Application.Abstractions;
 using Finbridge.Application.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finbridge.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public sealed class UsersController : ControllerBase
 {
