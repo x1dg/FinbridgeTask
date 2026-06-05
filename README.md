@@ -34,6 +34,8 @@ dotnet test Finbridge.slnx
 | `POST` | `/api/balances` | Обновить баланс |
 | `POST` | `/api/balances/batch` | Пакетное обновление |
 | `GET`  | `/api/balances/history/{userId}` | История баланса (последние 20) |
+| `GET`  | `/health/live` | Liveness (всегда 200 если процесс жив) |
+| `GET`  | `/health/ready` | Readiness (Postgres + Kafka + outbox) |
 
 Swagger: `http://localhost:8080/swagger`.
 

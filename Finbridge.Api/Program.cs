@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using System.Threading.RateLimiting;
 using Confluent.Kafka;
+using Finbridge.Api.HealthChecks;
 using Finbridge.Api.Middleware;
 using Finbridge.Api.Outbox;
 using Finbridge.Api.Resilience;
@@ -107,6 +108,12 @@ builder.Services.AddHostedService<OutboxRelayService>();
 
 builder.Services.AddApplication();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString, name: "postgres", tags: new[] { "ready" })
+    .AddKafka(opts => opts.BootstrapServers = builder.Configuration["KafkaSettings:BootstrapServers"] ?? "localhost:9092", name: "kafka", tags: new[] { "ready" })
+    .AddCheck<OutboxHealthCheck>("outbox", tags: new[] { "ready" });
+
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter(policyName: "fixed", options =>
     {
@@ -132,6 +139,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandling();
 app.UseRateLimiter();
+
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+});
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+});
 
 if (app.Environment.IsDevelopment())
 {
