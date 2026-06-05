@@ -46,6 +46,13 @@ builder.Services.AddRateLimiter(_ => _
 
 var app = builder.Build();
 
+// Ensure database is created (for demo / Docker first-run)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FinbridgeDbContext>();
+    db.Database.EnsureCreated();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -59,7 +66,10 @@ app.UseExceptionHandling();
 // Rate limiting middleware
 app.UseRateLimiter();
 
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseAuthorization();
 
