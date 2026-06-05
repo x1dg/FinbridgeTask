@@ -15,7 +15,11 @@ public static class DependencyInjection
         string connectionString)
     {
         services.AddDbContext<FinbridgeDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(connectionString, npgsql =>
+                npgsql.EnableRetryOnFailure(
+                    maxRetryCount: 3,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null)));
 
         services.AddScoped<IUserRepository, UserRepository>();
         return services;
