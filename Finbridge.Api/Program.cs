@@ -1,4 +1,6 @@
+using System.Net.Sockets;
 using System.Threading.RateLimiting;
+using Confluent.Kafka;
 using Finbridge.Api.Events;
 using Finbridge.Api.Middleware;
 using Finbridge.Api.Resilience;
@@ -32,6 +34,9 @@ builder.Services.AddResiliencePipeline(ResiliencePipelines.KafkaProducer, (pipel
 {
     var opts = context.ServiceProvider
         .GetRequiredService<IOptions<KafkaResilienceOptions>>().Value;
+    var logger = context.ServiceProvider
+        .GetRequiredService<ILoggerFactory>()
+        .CreateLogger("Finbridge.Resilience.Kafka");
 
     pipelineBuilder
         .AddRetry(new RetryStrategyOptions
@@ -47,6 +52,34 @@ builder.Services.AddResiliencePipeline(ResiliencePipelines.KafkaProducer, (pipel
             MinimumThroughput = opts.CircuitBreaker.MinimumThroughput,
             SamplingDuration = TimeSpan.FromSeconds(opts.CircuitBreaker.SamplingDurationSec),
             BreakDuration = TimeSpan.FromSeconds(opts.CircuitBreaker.BreakDurationSec),
+
+            ShouldHandle = new PredicateBuilder()
+                .Handle<ProduceException<Null, string>>()
+                .Handle<KafkaException>()
+                .Handle<TimeoutException>()
+                .Handle<HttpRequestException>()
+                .Handle<SocketException>()
+                .Handle<IOException>(),
+
+            OnOpened = args =>
+            {
+                logger.LogError(
+                    args.Outcome.Exception,
+                    "Kafka circuit breaker OPENED for {BreakDurationSeconds}s. Last failure: {ExceptionType}.",
+                    args.BreakDuration.TotalSeconds,
+                    args.Outcome.Exception?.GetType().Name ?? "n/a");
+                return ValueTask.CompletedTask;
+            },
+            OnClosed = args =>
+            {
+                logger.LogInformation("Kafka circuit breaker CLOSED — producer is healthy again.");
+                return ValueTask.CompletedTask;
+            },
+            OnHalfOpened = args =>
+            {
+                logger.LogWarning("Kafka circuit breaker HALF-OPEN — probing producer with next call.");
+                return ValueTask.CompletedTask;
+            },
         })
         .AddRateLimiter(new RateLimiterStrategyOptions
         {
