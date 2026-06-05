@@ -1,5 +1,3 @@
-using Finbridge.Domain.Users.ValueObjects;
-
 namespace Finbridge.Domain.Users.Repositories;
 
 /// <summary>

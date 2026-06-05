@@ -5,7 +5,6 @@ using Finbridge.Data.Repositories;
 using Finbridge.Domain.Common;
 using Finbridge.Domain.Users.Events;
 using Finbridge.Domain.Users.Exceptions;
-using Finbridge.Domain.Users.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;

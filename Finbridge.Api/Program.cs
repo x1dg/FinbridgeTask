@@ -8,7 +8,6 @@ using Finbridge.Application.Services;
 using Finbridge.Data;
 using Finbridge.Domain.Users.Events;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

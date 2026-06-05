@@ -3,7 +3,6 @@ using Finbridge.Application.Services;
 using Finbridge.Data;
 using Finbridge.Data.Repositories;
 using Finbridge.Domain.Common;
-using Finbridge.Domain.Users.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Finbridge.Tests.Application;

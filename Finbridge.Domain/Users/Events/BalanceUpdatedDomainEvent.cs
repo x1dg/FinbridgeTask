@@ -1,5 +1,4 @@
 using Finbridge.Domain.Common;
-using Finbridge.Domain.Users.ValueObjects;
 
 namespace Finbridge.Domain.Users.Events;
 
