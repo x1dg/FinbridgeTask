@@ -1,21 +1,26 @@
+using Finbridge.Application.Abstractions;
+using Finbridge.Application.Configuration;
 using Finbridge.Application.Contracts;
-using Finbridge.Application.Services;
+using Finbridge.Application.Users.Commands;
+using Finbridge.Application.Users.Queries;
 using Finbridge.Data;
 using Finbridge.Data.Interceptors;
 using Finbridge.Data.Outbox;
 using Finbridge.Data.Repositories;
 using Finbridge.Domain.Users.Events;
 using Finbridge.Domain.Users.Exceptions;
+using Finbridge.Domain.Users.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace Finbridge.Tests.Application;
 
-public class BalanceServiceTests
+public class BalancesHandlerTests
 {
-    private static (BalanceService svc, FinbridgeDbContext ctx) Build(decimal maxBalance = 1_000_000m)
+    private static (IRequestDispatcher dispatcher, FinbridgeDbContext ctx) Build(decimal maxBalance = 1_000_000m)
     {
-        var dbName = $"BalanceTestDb_{Guid.NewGuid():N}";
+        var dbName = $"BalancesTestDb_{Guid.NewGuid():N}";
         var options = new DbContextOptionsBuilder<FinbridgeDbContext>()
             .UseInMemoryDatabase(dbName)
             .AddInterceptors(new OutboxSaveChangesInterceptor())
@@ -25,20 +30,27 @@ public class BalanceServiceTests
         ctx.Database.EnsureCreated();
 
         var repo = new UserRepository(ctx);
-        var svc = new BalanceService(
-            repo,
-            Options.Create(new BalanceSettings { MaxBalance = maxBalance }));
-        return (svc, ctx);
+
+        var services = new ServiceCollection();
+        services.AddScoped<IUserRepository>(_ => repo);
+        services.AddScoped<IRequestDispatcher, RequestDispatcher>();
+        services.AddScoped<IRequestHandler<CreateUserRequest, UserResponse>, CreateUserHandler>();
+        services.AddScoped<IRequestHandler<UpdateBalanceRequest, UserResponse>, UpdateBalanceHandler>();
+        services.AddScoped<IRequestHandler<BatchUpdateBalancesRequest, Unit>, BatchUpdateBalancesHandler>();
+        services.AddScoped<IRequestHandler<GetBalanceHistoryQuery, IReadOnlyList<BalanceHistoryResponse>>, GetBalanceHistoryHandler>();
+        services.AddSingleton(Options.Create(new BalanceSettings { MaxBalance = maxBalance }));
+        var sp = services.BuildServiceProvider();
+        return (sp.GetRequiredService<IRequestDispatcher>(), ctx);
     }
 
     [Fact]
-    public async Task UpdateBalanceAsync_ShouldApplyDelta_AndEnqueueOutboxMessage()
+    public async Task UpdateBalance_ShouldApplyDelta_AndEnqueueOutboxMessage()
     {
-        var (svc, ctx) = Build();
-        var user = await new UserService(new UserRepository(ctx)).CreateAsync(
-            new CreateUserRequest("Иван", new DateTime(1990, 1, 1), "Москва"));
+        var (dispatcher, ctx) = Build();
+        var user = await dispatcher.SendAsync(new CreateUserRequest(
+            "Иван", new DateTime(1990, 1, 1), "Москва"));
 
-        var result = await svc.UpdateBalanceAsync(new UpdateBalanceRequest(user.Id, 250m));
+        var result = await dispatcher.SendAsync(new UpdateBalanceRequest(user.Id, 250m));
 
         Assert.Equal(250m, result.Balance);
 
@@ -51,51 +63,50 @@ public class BalanceServiceTests
     }
 
     [Fact]
-    public async Task UpdateBalanceAsync_ShouldThrow_WhenUserNotFound()
+    public async Task UpdateBalance_ShouldThrow_WhenUserNotFound()
     {
-        var (svc, _) = Build();
+        var (dispatcher, _) = Build();
         await Assert.ThrowsAsync<UserNotFoundException>(() =>
-            svc.UpdateBalanceAsync(new UpdateBalanceRequest(999, 100m)));
+            dispatcher.SendAsync(new UpdateBalanceRequest(999, 100m)));
     }
 
     [Fact]
-    public async Task UpdateBalanceAsync_ShouldThrow_WhenResultWouldBeNegative()
+    public async Task UpdateBalance_ShouldThrow_WhenResultWouldBeNegative()
     {
-        var (svc, ctx) = Build();
-        var user = await new UserService(new UserRepository(ctx)).CreateAsync(
-            new CreateUserRequest("Иван", new DateTime(1990, 1, 1), "Москва"));
+        var (dispatcher, _) = Build();
+        var user = await dispatcher.SendAsync(new CreateUserRequest(
+            "Иван", new DateTime(1990, 1, 1), "Москва"));
 
         await Assert.ThrowsAsync<NegativeBalanceException>(() =>
-            svc.UpdateBalanceAsync(new UpdateBalanceRequest(user.Id, -1m)));
+            dispatcher.SendAsync(new UpdateBalanceRequest(user.Id, -1m)));
     }
 
     [Fact]
-    public async Task UpdateBalanceAsync_ShouldThrow_WhenExceedsMaxBalance()
+    public async Task UpdateBalance_ShouldThrow_WhenExceedsMaxBalance()
     {
-        var (svc, ctx) = Build(maxBalance: 100m);
-        var user = await new UserService(new UserRepository(ctx)).CreateAsync(
-            new CreateUserRequest("Иван", new DateTime(1990, 1, 1), "Москва"));
+        var (dispatcher, _) = Build(maxBalance: 100m);
+        var user = await dispatcher.SendAsync(new CreateUserRequest(
+            "Иван", new DateTime(1990, 1, 1), "Москва"));
 
         await Assert.ThrowsAsync<BalanceLimitExceededException>(() =>
-            svc.UpdateBalanceAsync(new UpdateBalanceRequest(user.Id, 200m)));
+            dispatcher.SendAsync(new UpdateBalanceRequest(user.Id, 200m)));
     }
 
     [Fact]
-    public async Task UpdateBalancesAsync_ShouldProcessAllItems()
+    public async Task BatchUpdateBalances_ShouldProcessAllItems()
     {
-        var (svc, ctx) = Build();
-        var userService = new UserService(new UserRepository(ctx));
-        var u1 = await userService.CreateAsync(new CreateUserRequest("А", new DateTime(1990, 1, 1), "X"));
-        var u2 = await userService.CreateAsync(new CreateUserRequest("Б", new DateTime(1990, 1, 1), "Y"));
+        var (dispatcher, _) = Build();
+        var u1 = await dispatcher.SendAsync(new CreateUserRequest("А", new DateTime(1990, 1, 1), "X"));
+        var u2 = await dispatcher.SendAsync(new CreateUserRequest("Б", new DateTime(1990, 1, 1), "Y"));
 
-        await svc.UpdateBalancesAsync(new BatchUpdateBalancesRequest(new[]
+        await dispatcher.SendAsync(new BatchUpdateBalancesRequest(new[]
         {
             new UpdateBalanceRequest(u1.Id, 10m),
             new UpdateBalanceRequest(u2.Id, 20m),
         }));
 
-        var h1 = await svc.GetBalanceHistoryAsync(u1.Id);
-        var h2 = await svc.GetBalanceHistoryAsync(u2.Id);
+        var h1 = await dispatcher.SendAsync(new GetBalanceHistoryQuery(u1.Id));
+        var h2 = await dispatcher.SendAsync(new GetBalanceHistoryQuery(u2.Id));
         Assert.Single(h1);
         Assert.Single(h2);
     }

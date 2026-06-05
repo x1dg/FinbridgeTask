@@ -1,3 +1,4 @@
+using Finbridge.Application.Abstractions;
 using Finbridge.Domain.Users.ValueObjects;
 
 namespace Finbridge.Application.Contracts;
@@ -5,14 +6,20 @@ namespace Finbridge.Application.Contracts;
 public sealed record CreateUserRequest(
     string FullName,
     DateTime DateOfBirth,
-    string PlaceOfBirth);
+    string PlaceOfBirth) : ICommand<UserResponse>;
 
 public sealed record UpdateBalanceRequest(
     int UserId,
-    decimal Amount);
+    decimal Amount) : ICommand<UserResponse>;
 
 public sealed record BatchUpdateBalancesRequest(
-    IReadOnlyList<UpdateBalanceRequest> Updates);
+    IReadOnlyList<UpdateBalanceRequest> Updates) : ICommand<Unit>;
+
+public sealed record GetUserByIdQuery(int Id) : IQuery<UserResponse?>;
+
+public sealed record GetAllUsersQuery() : IQuery<IReadOnlyList<UserResponse>>;
+
+public sealed record GetBalanceHistoryQuery(int UserId, int Limit = 20) : IQuery<IReadOnlyList<BalanceHistoryResponse>>;
 
 public sealed record UserResponse(
     int Id,

@@ -1,4 +1,4 @@
-namespace Finbridge.Application.Services;
+namespace Finbridge.Application.Configuration;
 
 public sealed class BalanceSettings
 {

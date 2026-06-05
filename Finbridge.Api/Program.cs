@@ -6,7 +6,7 @@ using Finbridge.Api.Outbox;
 using Finbridge.Api.Resilience;
 using Finbridge.Api.Services;
 using Finbridge.Application;
-using Finbridge.Application.Services;
+using Finbridge.Application.Configuration;
 using Finbridge.Data;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;

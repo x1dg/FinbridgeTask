@@ -1,5 +1,5 @@
+using Finbridge.Application.Abstractions;
 using Finbridge.Application.Contracts;
-using Finbridge.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finbridge.Api.Controllers;
@@ -8,11 +8,11 @@ namespace Finbridge.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class UsersController : ControllerBase
 {
-    private readonly IUserService _userService;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public UsersController(IUserService userService)
+    public UsersController(IRequestDispatcher dispatcher)
     {
-        _userService = userService;
+        _dispatcher = dispatcher;
     }
 
     [HttpPost]
@@ -20,21 +20,21 @@ public sealed class UsersController : ControllerBase
         [FromBody] CreateUserRequest request,
         CancellationToken cancellationToken)
     {
-        var user = await _userService.CreateAsync(request, cancellationToken);
+        var user = await _dispatcher.SendAsync(request, cancellationToken);
         return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
     }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserResponse>> GetUserById(int id, CancellationToken cancellationToken)
     {
-        var user = await _userService.GetByIdAsync(id, cancellationToken);
+        var user = await _dispatcher.SendAsync(new GetUserByIdQuery(id), cancellationToken);
         return user is null ? NotFound() : Ok(user);
     }
 
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<UserResponse>>> GetAllUsers(CancellationToken cancellationToken)
     {
-        var users = await _userService.GetAllAsync(cancellationToken);
+        var users = await _dispatcher.SendAsync(new GetAllUsersQuery(), cancellationToken);
         return Ok(users);
     }
 }

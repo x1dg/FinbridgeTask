@@ -1,6 +1,5 @@
+using Finbridge.Application.Abstractions;
 using Finbridge.Application.Contracts;
-using Finbridge.Application.Services;
-using Finbridge.Domain.Users.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Finbridge.Api.Controllers;
@@ -9,11 +8,11 @@ namespace Finbridge.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class BalancesController : ControllerBase
 {
-    private readonly IBalanceService _balanceService;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public BalancesController(IBalanceService balanceService)
+    public BalancesController(IRequestDispatcher dispatcher)
     {
-        _balanceService = balanceService;
+        _dispatcher = dispatcher;
     }
 
     [HttpPost]
@@ -21,23 +20,8 @@ public sealed class BalancesController : ControllerBase
         [FromBody] UpdateBalanceRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var user = await _balanceService.UpdateBalanceAsync(request, cancellationToken);
-            return Ok(user);
-        }
-        catch (UserNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (NegativeBalanceException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (BalanceLimitExceededException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var user = await _dispatcher.SendAsync(request, cancellationToken);
+        return Ok(user);
     }
 
     [HttpPost("batch")]
@@ -45,23 +29,8 @@ public sealed class BalancesController : ControllerBase
         [FromBody] BatchUpdateBalancesRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            await _balanceService.UpdateBalancesAsync(request, cancellationToken);
-            return Ok();
-        }
-        catch (UserNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (NegativeBalanceException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (BalanceLimitExceededException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        await _dispatcher.SendAsync(request, cancellationToken);
+        return Ok();
     }
 
     [HttpGet("history/{userId:int}")]
@@ -70,7 +39,7 @@ public sealed class BalancesController : ControllerBase
         [FromQuery] int limit = 20,
         CancellationToken cancellationToken = default)
     {
-        var history = await _balanceService.GetBalanceHistoryAsync(userId, limit, cancellationToken);
+        var history = await _dispatcher.SendAsync(new GetBalanceHistoryQuery(userId, limit), cancellationToken);
         return Ok(history);
     }
 }
