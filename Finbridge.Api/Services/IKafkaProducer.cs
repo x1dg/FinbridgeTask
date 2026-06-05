@@ -1,10 +1,6 @@
-using System.Threading.Tasks;
-using Finbridge.Core.Models;
+namespace Finbridge.Api.Services;
 
-namespace Finbridge.Api.Services
+public interface IKafkaProducer
 {
-    public interface IKafkaProducer
-    {
-        Task ProduceUserEventAsync(User user);
-    }
+    Task ProduceAsync(string topic, string payload, CancellationToken cancellationToken = default);
 }

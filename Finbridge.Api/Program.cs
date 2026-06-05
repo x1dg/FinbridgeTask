@@ -1,69 +1,55 @@
-using Finbridge.Data;
-using Finbridge.Api.Services;
+using System.Threading.RateLimiting;
+using Finbridge.Api.Events;
 using Finbridge.Api.Middleware;
+using Finbridge.Api.Services;
+using Finbridge.Application;
+using Finbridge.Application.Events;
+using Finbridge.Application.Services;
+using Finbridge.Data;
+using Finbridge.Domain.Users.Events;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add MVC services
-builder.Services.AddControllersWithViews();
+builder.Services.Configure<BalanceSettings>(builder.Configuration.GetSection("BalanceSettings"));
+builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("KafkaSettings"));
 
-// Configure DbContext with PostgreSQL
-builder.Services.AddDbContext<FinbridgeDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection")!);
 
-// Add services for balance settings
-builder.Services.Configure<BalanceSettings>(
-    builder.Configuration.GetSection("BalanceSettings"));
-
-// Add services for Kafka settings
-builder.Services.Configure<KafkaSettings>(
-    builder.Configuration.GetSection("KafkaSettings"));
-
-// Register services
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<BalanceService>();
 builder.Services.AddScoped<IKafkaProducer, KafkaProducer>();
+builder.Services.AddScoped<IDomainEventHandler<BalanceUpdatedDomainEvent>, BalanceUpdatedKafkaHandler>();
 
-// Rate limiting configuration
+builder.Services.AddApplication();
+
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter(policyName: "fixed", options =>
     {
-        options.PermitLimit = 10; // 10 requests
-        options.Window = TimeSpan.FromSeconds(10); // per 10 seconds
-        options.QueueLimit = 5; // allow 5 requests to be queued
+        options.PermitLimit = 10;
+        options.Window = TimeSpan.FromSeconds(10);
+        options.QueueLimit = 5;
         options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     }));
 
 var app = builder.Build();
 
-// Ensure database is created (for demo / Docker first-run)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<FinbridgeDbContext>();
     db.Database.EnsureCreated();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Custom exception handling middleware
 app.UseExceptionHandling();
-
-// Rate limiting middleware
 app.UseRateLimiter();
 
 if (app.Environment.IsDevelopment())

@@ -1,43 +1,40 @@
-using Finbridge.Api.Dtos;
-using Finbridge.Api.Services;
-using Finbridge.Core.Models;
+using Finbridge.Application.Contracts;
+using Finbridge.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Finbridge.Api.Controllers
+namespace Finbridge.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public sealed class UsersController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        private readonly UserService _userService;
+        _userService = userService;
+    }
 
-        public UsersController(UserService userService)
-        {
-            _userService = userService;
-        }
+    [HttpPost]
+    public async Task<ActionResult<UserResponse>> CreateUser(
+        [FromBody] CreateUserRequest request,
+        CancellationToken cancellationToken)
+    {
+        var user = await _userService.CreateAsync(request, cancellationToken);
+        return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+    }
 
-        [HttpPost]
-        public ActionResult<User> CreateUser(CreateUserDto dto)
-        {
-            var user = _userService.CreateUser(dto);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
-        }
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<UserResponse>> GetUserById(int id, CancellationToken cancellationToken)
+    {
+        var user = await _userService.GetByIdAsync(id, cancellationToken);
+        return user is null ? NotFound() : Ok(user);
+    }
 
-        [HttpGet("{id}")]
-        public ActionResult<User> GetUserById(int id)
-        {
-            var user = _userService.GetUserById(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-            return user;
-        }
-
-        [HttpGet]
-        public ActionResult<IEnumerable<User>> GetAllUsers()
-        {
-            return _userService.GetAllUsers().ToList();
-        }
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<UserResponse>>> GetAllUsers(CancellationToken cancellationToken)
+    {
+        var users = await _userService.GetAllAsync(cancellationToken);
+        return Ok(users);
     }
 }

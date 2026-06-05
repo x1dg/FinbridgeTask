@@ -1,65 +1,76 @@
-using Finbridge.Api.Dtos;
-using Finbridge.Api.Services;
-using Finbridge.Core.Models;
+using Finbridge.Application.Contracts;
+using Finbridge.Application.Services;
+using Finbridge.Domain.Users.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Finbridge.Api.Controllers
+namespace Finbridge.Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public sealed class BalancesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class BalancesController : ControllerBase
+    private readonly IBalanceService _balanceService;
+
+    public BalancesController(IBalanceService balanceService)
     {
-        private readonly BalanceService _balanceService;
+        _balanceService = balanceService;
+    }
 
-        public BalancesController(BalanceService balanceService)
+    [HttpPost]
+    public async Task<ActionResult<UserResponse>> UpdateBalance(
+        [FromBody] UpdateBalanceRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
         {
-            _balanceService = balanceService;
+            var user = await _balanceService.UpdateBalanceAsync(request, cancellationToken);
+            return Ok(user);
         }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (NegativeBalanceException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (BalanceLimitExceededException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-        // POST api/balances
-        [HttpPost]
-        public async Task<ActionResult<User>> UpdateBalance(UpdateBalanceDto dto)
+    [HttpPost("batch")]
+    public async Task<IActionResult> UpdateBalances(
+        [FromBody] BatchUpdateBalancesRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
         {
-            try
-            {
-                var user = await _balanceService.UpdateBalance(dto.UserId, dto.Amount);
-                return Ok(user);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            await _balanceService.UpdateBalancesAsync(request, cancellationToken);
+            return Ok();
         }
+        catch (UserNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (NegativeBalanceException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (BalanceLimitExceededException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
 
-        // POST api/balances/batch
-        [HttpPost("batch")]
-        public async Task<IActionResult> UpdateBalances(List<UpdateBalanceDto> updates)
-        {
-            try
-            {
-                await _balanceService.UpdateBalances(updates);
-                return Ok();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // GET api/balances/history/{userId}
-        [HttpGet("history/{userId}")]
-        public ActionResult<List<BalanceHistory>> GetBalanceHistory(int userId)
-        {
-            var history = _balanceService.GetBalanceHistory(userId);
-            return Ok(history);
-        }
+    [HttpGet("history/{userId:int}")]
+    public async Task<ActionResult<IReadOnlyList<BalanceHistoryResponse>>> GetBalanceHistory(
+        int userId,
+        [FromQuery] int limit = 20,
+        CancellationToken cancellationToken = default)
+    {
+        var history = await _balanceService.GetBalanceHistoryAsync(userId, limit, cancellationToken);
+        return Ok(history);
     }
 }

@@ -1,41 +1,30 @@
 using Confluent.Kafka;
-using Finbridge.Core.Models;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace Finbridge.Api.Services
+namespace Finbridge.Api.Services;
+
+public sealed class KafkaProducer : IKafkaProducer
 {
-    public class KafkaProducer : IKafkaProducer
+    private readonly IProducer<Null, string> _producer;
+    private readonly string _defaultTopic;
+
+    public KafkaProducer(IOptions<KafkaSettings> settings)
     {
-        private readonly ProducerConfig _config;
-        private readonly string _topic;
-
-        public KafkaProducer(IOptions<KafkaSettings> settings)
+        var config = new ProducerConfig
         {
-            _config = new ProducerConfig
-            {
-                BootstrapServers = settings.Value.BootstrapServers
-            };
-            _topic = settings.Value.Topic;
-        }
+            BootstrapServers = settings.Value.BootstrapServers
+        };
+        _producer = new ProducerBuilder<Null, string>(config).Build();
+        _defaultTopic = settings.Value.Topic;
+    }
 
-        public async Task ProduceUserEventAsync(User user)
-        {
-            using var producer = new ProducerBuilder<Null, string>(_config).Build();
-            var userEvent = new
-            {
-                user.Id,
-                user.FullName,
-                user.DateOfBirth,
-                user.PlaceOfBirth,
-                user.Balance,
-                EventTimestamp = DateTime.UtcNow
-            };
-
-            var json = JsonSerializer.Serialize(userEvent);
-            await producer.ProduceAsync(_topic, new Message<Null, string> { Value = json });
-            producer.Flush(TimeSpan.FromSeconds(10));
-        }
+    public async Task ProduceAsync(string topic, string payload, CancellationToken cancellationToken = default)
+    {
+        var targetTopic = string.IsNullOrWhiteSpace(topic) ? _defaultTopic : topic;
+        await _producer.ProduceAsync(
+            targetTopic,
+            new Message<Null, string> { Value = payload },
+            cancellationToken);
+        _producer.Flush(TimeSpan.FromSeconds(10));
     }
 }

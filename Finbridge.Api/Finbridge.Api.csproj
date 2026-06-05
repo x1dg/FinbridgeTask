@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Finbridge.Core\Finbridge.Core.csproj" />
+    <ProjectReference Include="..\Finbridge.Domain\Finbridge.Domain.csproj" />
+    <ProjectReference Include="..\Finbridge.Application\Finbridge.Application.csproj" />
     <ProjectReference Include="..\Finbridge.Data\Finbridge.Data.csproj" />
   </ItemGroup>
 
