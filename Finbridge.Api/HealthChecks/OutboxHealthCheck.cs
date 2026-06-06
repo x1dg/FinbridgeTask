@@ -9,10 +9,12 @@ public sealed class OutboxHealthCheck : IHealthCheck
     private static readonly TimeSpan StaleThreshold = TimeSpan.FromSeconds(60);
 
     private readonly FinbridgeDbContext _context;
+    private readonly TimeProvider _timeProvider;
 
-    public OutboxHealthCheck(FinbridgeDbContext context)
+    public OutboxHealthCheck(FinbridgeDbContext context, TimeProvider timeProvider)
     {
         _context = context;
+        _timeProvider = timeProvider;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
@@ -28,7 +30,7 @@ public sealed class OutboxHealthCheck : IHealthCheck
             return HealthCheckResult.Healthy("Outbox пуст.");
         }
 
-        var age = DateTime.UtcNow - oldest.Value;
+        var age = _timeProvider.GetUtcNow().UtcDateTime - oldest.Value;
         var data = new Dictionary<string, object> { ["oldestPendingAge"] = age };
 
         return age > StaleThreshold

@@ -2,15 +2,15 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY Finbridge.slnx ./
-COPY Finbridge.Core/Finbridge.Core.csproj Finbridge.Core/
+COPY Finbridge.Domain/Finbridge.Domain.csproj Finbridge.Domain/
+COPY Finbridge.Application/Finbridge.Application.csproj Finbridge.Application/
 COPY Finbridge.Data/Finbridge.Data.csproj Finbridge.Data/
 COPY Finbridge.Api/Finbridge.Api.csproj Finbridge.Api/
-COPY Finbridge.Web/Finbridge.Web.csproj Finbridge.Web/
-COPY Finbridge.Tests/Finbridge.Tests.csproj Finbridge.Tests/
 
 RUN dotnet restore Finbridge.Api/Finbridge.Api.csproj
 
-COPY Finbridge.Core/ Finbridge.Core/
+COPY Finbridge.Domain/ Finbridge.Domain/
+COPY Finbridge.Application/ Finbridge.Application/
 COPY Finbridge.Data/ Finbridge.Data/
 COPY Finbridge.Api/ Finbridge.Api/
 

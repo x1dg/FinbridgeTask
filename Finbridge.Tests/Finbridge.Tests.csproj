@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Finbridge.Domain\Finbridge.Domain.csproj" />
     <ProjectReference Include="..\Finbridge.Application\Finbridge.Application.csproj" />
     <ProjectReference Include="..\Finbridge.Data\Finbridge.Data.csproj" />
+    <ProjectReference Include="..\Finbridge.Api\Finbridge.Api.csproj" />
   </ItemGroup>
 
 </Project>

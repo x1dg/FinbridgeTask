@@ -79,15 +79,43 @@ OpenTelemetry: распределённые трейсы (HTTP, EF, ASP.NET Core
 
 ```json
 {
-  "ConnectionStrings": { "DefaultConnection": "Host=localhost;Port=5432;Database=finbridge;Username=postgres;Password=postgres" },
+  "ConnectionStrings": { "DefaultConnection": "Host=postgres;Port=5432;Database=finbridge;Username=postgres;Password=postgres" },
   "BalanceSettings":   { "MaxBalance": 1000000 },
-  "KafkaSettings":     { "BootstrapServers": "localhost:9092", "Topic": "users.events" },
-  "JwtSettings":       { "Issuer": "finbridge", "Audience": "finbridge", "ExpirationHours": 24 },
+  "KafkaSettings":     { "BootstrapServers": "kafka:9092", "Topic": "users.events" },
+  "KafkaResilience":   {
+    "Retry":          { "MaxAttempts": 3, "BaseDelayMs": 200 },
+    "CircuitBreaker": { "FailureRatio": 0.5, "MinimumThroughput": 5, "SamplingDurationSec": 30, "BreakDurationSec": 15 },
+    "RateLimiter":    { "PermitLimit": 100, "WindowSec": 1, "SegmentsPerWindow": 10, "QueueLimit": 50 }
+  },
+  "JwtSettings":       { "Issuer": "finbridge", "Audience": "finbridge", "SigningKey": "<set-via-env>", "ExpirationHours": 24 },
   "OpenTelemetry":     { "OtlpEndpoint": "" }
 }
 ```
 
-Переопределение через ENV: `ConnectionStrings__DefaultConnection`, `KafkaSettings__BootstrapServers` и т.д.
+`Finbridge.Web/appsettings.json`:
+
+```json
+{ "ApiSettings": { "BaseUrl": "http://api:8080" } }
+```
+
+Переопределение через ENV (приоритет над `appsettings.json`):
+
+| ENV | Назначение |
+|-----|------------|
+| `ConnectionStrings__DefaultConnection` | строка подключения к Postgres |
+| `BalanceSettings__MaxBalance` | лимит баланса |
+| `KafkaSettings__BootstrapServers` / `KafkaSettings__Topic` | адрес и топик Kafka |
+| `KafkaResilience__*` | параметры resilience pipeline (см. `KafkaResilienceOptions`) |
+| `JwtSettings__SigningKey` | **обязателен в проде** (≥32 символа для HS256); в репо только dev-значение |
+| `OpenTelemetry__OtlpEndpoint` | URL OTLP-коллектора; пусто — экспорт выключен |
+| `ApiSettings__BaseUrl` | URL API для Web-клиента |
+
+## База данных
+
+Используется `db.Database.Migrate()` при старте API — миграции лежат в `Finbridge.Data/Migrations/`.
+Для greenfield-развёртывания миграции накатываются автоматически; при изменении сущностей добавьте
+новую миграцию (`dotnet ef migrations add <Name> --project Finbridge.Data --startup-project Finbridge.Api`)
+и пересоберите образ.
 
 ## Контакты
 
