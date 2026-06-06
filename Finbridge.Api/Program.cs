@@ -15,6 +15,10 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Polly;
 using Polly.CircuitBreaker;
 using Polly.RateLimiting;
@@ -146,6 +150,36 @@ builder.Services.AddScoped<IOutboxPublisher, BalanceUpdatedOutboxPublisher>();
 builder.Services.AddHostedService<OutboxRelayService>();
 
 builder.Services.AddApplication();
+
+var otlpEndpoint = builder.Configuration["OpenTelemetry:OtlpEndpoint"];
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(r => r.AddService(
+        serviceName: "Finbridge.Api",
+        serviceVersion: typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0"))
+    .WithTracing(t =>
+    {
+        t.AddSource(OutboxTelemetry.SourceName)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true);
+
+        if (!string.IsNullOrEmpty(otlpEndpoint))
+        {
+            t.AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint));
+        }
+    })
+    .WithMetrics(m =>
+    {
+        m.AddMeter(OutboxTelemetry.MeterName)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddRuntimeInstrumentation();
+
+        if (!string.IsNullOrEmpty(otlpEndpoint))
+        {
+            m.AddOtlpExporter(o => o.Endpoint = new Uri(otlpEndpoint));
+        }
+    });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 builder.Services.AddHealthChecks()

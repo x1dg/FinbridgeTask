@@ -28,6 +28,7 @@ public sealed class OutboxRelayService : BackgroundService
 
         while (!stoppingToken.IsCancellationRequested)
         {
+            using var pollActivity = OutboxTelemetry.ActivitySource.StartActivity("outbox.poll");
             try
             {
                 await ProcessBatchAsync(stoppingToken);
@@ -65,6 +66,9 @@ public sealed class OutboxRelayService : BackgroundService
             .Take(BatchSize)
             .ToListAsync(cancellationToken);
 
+        var remaining = await context.OutboxMessages.CountAsync(m => m.ProcessedAt == null, cancellationToken);
+        OutboxTelemetry.SetPendingCount(remaining);
+
         if (pending.Count == 0)
         {
             return;
@@ -81,18 +85,26 @@ public sealed class OutboxRelayService : BackgroundService
                     "Нет издателя для сообщения outbox {MessageId} типа {MessageType}. Пропуск.",
                     message.Id, message.MessageType);
                 message.IncrementRetry("Нет зарегистрированного издателя");
+                OutboxTelemetry.FailedMessages.Add(1);
                 failed++;
                 continue;
             }
 
+            var sw = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 await publisher.PublishAsync(message, cancellationToken);
+                sw.Stop();
+                OutboxTelemetry.PublishDurationMs.Record(sw.Elapsed.TotalMilliseconds);
+                OutboxTelemetry.PublishedMessages.Add(1);
                 message.MarkProcessed();
                 processed++;
             }
             catch (Exception ex)
             {
+                sw.Stop();
+                OutboxTelemetry.PublishDurationMs.Record(sw.Elapsed.TotalMilliseconds);
+                OutboxTelemetry.FailedMessages.Add(1);
                 _logger.LogError(ex,
                     "Ошибка публикации outbox-сообщения {MessageId} типа {MessageType}.",
                     message.Id, message.MessageType);
@@ -102,6 +114,7 @@ public sealed class OutboxRelayService : BackgroundService
         }
 
         await context.SaveChangesAsync(cancellationToken);
+        OutboxTelemetry.SetPendingCount(await context.OutboxMessages.CountAsync(m => m.ProcessedAt == null, cancellationToken));
 
         if (processed > 0 || failed > 0)
         {
