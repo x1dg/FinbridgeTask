@@ -162,7 +162,7 @@ builder.Services.AddOpenTelemetry()
         t.AddSource(OutboxTelemetry.SourceName)
             .AddAspNetCoreInstrumentation()
             .AddHttpClientInstrumentation()
-            .AddEntityFrameworkCoreInstrumentation(o => o.SetDbStatementForText = true);
+            .AddEntityFrameworkCoreInstrumentation();
 
         if (!string.IsNullOrEmpty(otlpEndpoint))
         {

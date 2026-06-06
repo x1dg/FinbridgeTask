@@ -62,7 +62,7 @@ public class OutboxRelayServiceTests
         }
 
         Assert.Equal(1, publisher.PublishCount);
-        Assert.Equal(1, publisher.LastMessageIds.Count);
+        Assert.Single(publisher.LastMessageIds);
         var processed = await ctx.OutboxMessages.AsNoTracking().SingleAsync();
         Assert.NotNull(processed.ProcessedAt);
     }
