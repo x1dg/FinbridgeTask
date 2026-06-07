@@ -1,0 +1,153 @@
+@page "/"
+@inject IRequestDispatcher Dispatcher
+@inject IMessageService MessageService
+
+<PageTitle>Пользователи</PageTitle>
+
+<Space Style="margin-bottom: 16px;" Size="@("large")">
+    <SpaceItem>
+        <Title Level="2" Style="margin: 0;">Пользователи</Title>
+    </SpaceItem>
+    <SpaceItem>
+        <Button Type="primary" Icon="@IconType.Outline.Plus" OnClick="ShowCreateModal">
+            Создать пользователя
+        </Button>
+    </SpaceItem>
+    <SpaceItem>
+        <Button Icon="@IconType.Outline.Reload" OnClick="LoadUsersAsync">
+            Обновить
+        </Button>
+    </SpaceItem>
+</Space>
+
+@if (_loading)
+{
+    <Spin Tip="Загрузка пользователей..." Size="large">
+        <div style="min-height: 200px;"></div>
+    </Spin>
+}
+else
+{
+    <Table TItem="UserResponse"
+           DataSource="@_users"
+           Size="TableSize.Middle"
+            Bordered
+           Loading="_loading">
+        <ChildContent>
+            <Column TData="int" Title="ID" DataIndex="@nameof(UserResponse.Id)" Width="80" />
+            <Column TData="string" Title="ФИО" DataIndex="@nameof(UserResponse.FullName)" />
+            <Column TData="string" Title="Место рождения" DataIndex="@nameof(UserResponse.PlaceOfBirth)" />
+            <Column TData="DateTime" Title="Дата рождения" DataIndex="@nameof(UserResponse.DateOfBirth)">
+                @context.DateOfBirth.ToString("d")
+            </Column>
+            <Column TData="decimal" Title="Баланс" DataIndex="@nameof(UserResponse.Balance)" Width="140">
+                <Tag Color="@(context.Balance >= 0 ? "green" : "red")">
+                    @context.Balance.ToString("N2")
+                </Tag>
+            </Column>
+            <Column TData="UserResponse" Title="Действия" Width="220">
+                <Button Size="small" Type="@ButtonType.Link" OnClick="@(() => NavigateToHistory(context.Id))">
+                    <Icon Type="history" /> История баланса
+                </Button>
+            </Column>
+        </ChildContent>
+    </Table>
+}
+
+<Modal Title="Создание пользователя"
+       Visible="@_createModalVisible"
+       OnOk="@HandleCreateAsync"
+       OnCancel="@(() => _createModalVisible = false)"
+       ConfirmLoading="@_createLoading">
+    <Form Model="@_newUser" Layout="@FormLayout.Vertical">
+        <FormItem Label="ФИО" Required>
+            <Input @bind-Value="@_newUser.FullName" Placeholder="Иванов Иван Иванович" />
+        </FormItem>
+        <FormItem Label="Дата рождения" Required>
+            <DatePicker TValue="DateTime?"
+                        @bind-Value="@_newUser.DateOfBirth"
+                        Format="dd.MM.yyyy"
+                        Placeholder="@("Выберите дату")"
+                        Style="width: 100%;" />
+        </FormItem>
+        <FormItem Label="Место рождения" Required>
+            <Input @bind-Value="@_newUser.PlaceOfBirth" Placeholder="г. Москва" />
+        </FormItem>
+    </Form>
+</Modal>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    private IReadOnlyList<UserResponse> _users = Array.Empty<UserResponse>();
+    private bool _loading = true;
+    private bool _createModalVisible;
+    private bool _createLoading;
+    private CreateUserForm _newUser = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        _loading = true;
+        try
+        {
+            _users = await Dispatcher.SendAsync(new GetAllUsersQuery());
+        }
+        catch (Exception ex)
+        {
+            await MessageService.Error($"Не удалось загрузить пользователей: {ex.Message}");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ShowCreateModal()
+    {
+        _newUser = new() { DateOfBirth = DateTime.Today.AddYears(-25) };
+        _createModalVisible = true;
+    }
+
+    private async Task HandleCreateAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_newUser.FullName)
+            || string.IsNullOrWhiteSpace(_newUser.PlaceOfBirth)
+            || _newUser.DateOfBirth is null)
+        {
+            await MessageService.Warning("Заполните все поля.");
+            return;
+        }
+
+        _createLoading = true;
+        try
+        {
+            await Dispatcher.SendAsync(new CreateUserRequest(
+                _newUser.FullName, _newUser.DateOfBirth.Value, _newUser.PlaceOfBirth));
+            await MessageService.Success("Пользователь создан.");
+            _createModalVisible = false;
+            await LoadUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            await MessageService.Error($"Ошибка создания: {ex.Message}");
+        }
+        finally
+        {
+            _createLoading = false;
+        }
+    }
+
+    private void NavigateToHistory(int userId) => Navigation.NavigateTo($"/balance-history/{userId}");
+
+    private sealed class CreateUserForm
+    {
+        public string FullName { get; set; } = string.Empty;
+        public DateTime? DateOfBirth { get; set; }
+        public string PlaceOfBirth { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,84 @@
+@page "/balance-history/{userId:int}"
+@inject IRequestDispatcher Dispatcher
+@inject IMessageService MessageService
+@inject NavigationManager Navigation
+
+<PageTitle>История баланса</PageTitle>
+
+<Space Style="margin-bottom: 16px;" Size="@("middle")">
+    <SpaceItem>
+        <Button Icon="@IconType.Outline.ArrowLeft" OnClick="@(() => Navigation.NavigateTo("/"))">
+            Назад
+        </Button>
+    </SpaceItem>
+    <SpaceItem>
+        <Title Level="2" Style="margin: 0;">История баланса — пользователь #@UserId</Title>
+    </SpaceItem>
+    <SpaceItem>
+        <Button Icon="@IconType.Outline.Reload" OnClick="LoadHistoryAsync">
+            Обновить
+        </Button>
+    </SpaceItem>
+</Space>
+
+@if (_loading)
+{
+    <Spin Tip="Загрузка истории..." Size="large">
+        <div style="min-height: 200px;"></div>
+    </Spin>
+}
+else
+{
+    <Table TItem="BalanceHistoryResponse"
+           DataSource="@_history"
+           Size="TableSize.Middle"
+           Bordered
+           Loading="_loading">
+        <ChildContent>
+            <Column TData="int" Title="#" Width="80">
+                @{ var i = _history.ToList().IndexOf(context) + 1; }
+                @i
+            </Column>
+            <Column TData="decimal" Title="Изменение" DataIndex="@nameof(BalanceHistoryResponse.AmountChanged)">
+                @context.AmountChanged.ToString("N2")
+            </Column>
+            <Column TData="decimal" Title="Новый баланс" DataIndex="@nameof(BalanceHistoryResponse.NewBalance)">
+                <Tag Color="@(context.NewBalance >= 0 ? "green" : "red")">
+                    @context.NewBalance.ToString("N2")
+                </Tag>
+            </Column>
+            <Column TData="DateTime" Title="Дата и время" DataIndex="@nameof(BalanceHistoryResponse.ChangedAt)">
+                @context.ChangedAt.ToLocalTime().ToString("g")
+            </Column>
+        </ChildContent>
+    </Table>
+}
+
+@code {
+    [Parameter] public int UserId { get; set; }
+
+    private IReadOnlyList<BalanceHistoryResponse> _history = Array.Empty<BalanceHistoryResponse>();
+    private bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadHistoryAsync();
+    }
+
+    private async Task LoadHistoryAsync()
+    {
+        _loading = true;
+        try
+        {
+            _history = await Dispatcher.SendAsync(new GetBalanceHistoryQuery(UserId, Limit: 100));
+        }
+        catch (Exception ex)
+        {
+            await MessageService.Error($"Не удалось загрузить историю: {ex.Message}");
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

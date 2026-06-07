@@ -1,0 +1,71 @@
+@inherits LayoutComponentBase
+@inject WeatherService Weather
+@implements IDisposable
+
+<Layout Style="min-height: 100vh;">
+    <Header Style="background: #001529; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-wrap: wrap; gap: 12px;">
+        <div style="color: #fff; font-size: 20px; font-weight: 600;">
+            💰 Finbridge Backoffice
+        </div>
+        @if (_weather is not null)
+        {
+            <div style="color: #fff; display: flex; align-items: center; gap: 14px; font-size: 13px; flex-wrap: wrap;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 22px;" title="@_weather.Description">@_weather.Icon</span>
+                    <b>@_weather.TemperatureDisplay</b>
+                    <span style="color: #c9c9c9;">@_weather.Description</span>
+                </span>
+                <span style="color: #555;">|</span>
+                <span title="Восход">🌅 @_weather.SunriseDisplay</span>
+                <span title="Закат">🌇 @_weather.SunsetDisplay</span>
+                <span style="color: #555;">|</span>
+                <span title="Полнолуние">@_weather.MoonDisplay</span>
+                <span style="color: #555;">|</span>
+                <span style="color: #c9c9c9;">📍 @_weather.City</span>
+            </div>
+        }
+        else if (_weatherLoading)
+        {
+            <Spin Size="small" />
+        }
+    </Header>
+    <Layout>
+        <Sider Width="220" Theme="SiderTheme.Light" Style="border-right: 1px solid #f0f0f0;">
+            <NavMenu />
+        </Sider>
+        <Layout Style="padding: 24px; background: #f5f5f5;">
+            <Content Style="background: #fff; padding: 24px; border-radius: 8px; min-height: calc(100vh - 112px - 48px);">
+                @Body
+            </Content>
+        </Layout>
+    </Layout>
+</Layout>
+
+@code {
+    private WeatherInfo? _weather;
+    private bool _weatherLoading = true;
+    private CancellationTokenSource? _cts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cts = new CancellationTokenSource();
+        try
+        {
+            _weather = await Weather.GetCurrentAsync("Москва", _cts.Token);
+        }
+        catch
+        {
+            // ignore
+        }
+        finally
+        {
+            _weatherLoading = false;
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

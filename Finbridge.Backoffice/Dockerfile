@@ -5,16 +5,16 @@ COPY Finbridge.slnx ./
 COPY Finbridge.Domain/Finbridge.Domain.csproj Finbridge.Domain/
 COPY Finbridge.Application/Finbridge.Application.csproj Finbridge.Application/
 COPY Finbridge.Data/Finbridge.Data.csproj Finbridge.Data/
-COPY Finbridge.Api/Finbridge.Api.csproj Finbridge.Api/
+COPY Finbridge.Backoffice/Finbridge.Backoffice.csproj Finbridge.Backoffice/
 
-RUN dotnet restore Finbridge.Api/Finbridge.Api.csproj
+RUN dotnet restore Finbridge.Backoffice/Finbridge.Backoffice.csproj
 
 COPY Finbridge.Domain/ Finbridge.Domain/
 COPY Finbridge.Application/ Finbridge.Application/
 COPY Finbridge.Data/ Finbridge.Data/
-COPY Finbridge.Api/ Finbridge.Api/
+COPY Finbridge.Backoffice/ Finbridge.Backoffice/
 
-RUN dotnet publish Finbridge.Api/Finbridge.Api.csproj \
+RUN dotnet publish Finbridge.Backoffice/Finbridge.Backoffice.csproj \
     -c Release \
     -o /app/publish \
     --no-restore \
@@ -32,4 +32,4 @@ ENV ASPNETCORE_ENVIRONMENT=Production
 
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "Finbridge.Api.dll"]
+ENTRYPOINT ["dotnet", "Finbridge.Backoffice.dll"]

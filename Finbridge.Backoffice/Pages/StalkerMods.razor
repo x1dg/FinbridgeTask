@@ -1,0 +1,413 @@
+@page "/stalker-mods"
+
+<PageTitle>S.T.A.L.K.E.R. Mods — Priboi Story</PageTitle>
+
+<style>
+    .stalker-hero {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #3d2817 100%);
+        color: #e8d8b8;
+        padding: 48px 32px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+    }
+    .stalker-hero::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at 30% 50%, rgba(255, 140, 0, 0.15) 0%, transparent 60%);
+        pointer-events: none;
+    }
+    .stalker-hero h1 {
+        color: #ff8c00 !important;
+        font-size: 36px !important;
+        text-shadow: 0 0 12px rgba(255, 140, 0, 0.4);
+        margin-bottom: 8px !important;
+    }
+    .stalker-hero .lead {
+        color: #c9b896;
+        font-size: 16px;
+        max-width: 720px;
+    }
+    .stalker-tag {
+        display: inline-block;
+        background: rgba(255, 140, 0, 0.15);
+        color: #ff8c00;
+        border: 1px solid rgba(255, 140, 0, 0.4);
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        margin-right: 8px;
+        margin-top: 8px;
+    }
+    .review-card {
+        background: #fafafa;
+        border-left: 4px solid #ff8c00;
+        padding: 20px 24px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+    .review-card .quote {
+        font-style: italic;
+        color: #333;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+    .review-card .author {
+        font-weight: 600;
+        color: #ff8c00;
+    }
+    .letsplay-link {
+        display: block;
+        text-decoration: none !important;
+        color: inherit !important;
+        height: 100%;
+    }
+    .letsplay-link:hover .letsplay-card {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(255, 140, 0, 0.3);
+    }
+    .letsplay-card {
+        background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+        color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+    .letsplay-thumb {
+        position: relative;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        background-color: #1a1a1a;
+    }
+    .letsplay-thumb::after {
+        content: "▶";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 140, 0, 0.9);
+        border-radius: 50%;
+        color: #1a1a1a;
+        font-size: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 6px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+    .letsplay-body {
+        padding: 16px;
+    }
+    .letsplay-body h4 {
+        color: #ff8c00 !important;
+        margin: 0 0 8px 0 !important;
+    }
+    .letsplay-body p {
+        color: #c9b896;
+        margin: 0;
+        font-size: 13px;
+    }
+    .letsplay-meta {
+        color: #888 !important;
+        font-size: 12px !important;
+        margin-top: 8px !important;
+    }
+    .photographer-card {
+        background: linear-gradient(135deg, #2d1810 0%, #1a1a1a 100%);
+        color: #e8d8b8;
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 24px;
+        display: flex;
+        gap: 32px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .photographer-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff8c00 0%, #d35400 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 56px;
+        color: #1a1a1a;
+        font-weight: 700;
+        flex-shrink: 0;
+        box-shadow: 0 8px 24px rgba(255, 140, 0, 0.3);
+    }
+    .photographer-info {
+        flex: 1;
+        min-width: 280px;
+    }
+    .photographer-info h2 {
+        color: #ff8c00 !important;
+        margin: 0 0 8px 0 !important;
+    }
+    .photographer-info .role {
+        color: #c9b896;
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+    .photographer-info .bio {
+        color: #e8d8b8;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+    .photo-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+    }
+    .photo-card {
+        height: 160px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+    .photo-card::after {
+        content: attr(data-caption);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
+        color: #fff;
+        padding: 24px 12px 10px;
+        font-size: 12px;
+    }
+</style>
+
+<div class="stalker-hero">
+    <h1>S.T.A.L.K.E.R.: Priboi Story — Eternal OGSR</h1>
+    <div class="lead">
+        Глобальная модификация на платформе OGSR Engine, продолжающая и расширяющая
+        легендарную сюжетную линию «Прибоя». Новые локации, квесты, оружие, группировки
+        и атмосфера Зоны — такой, какой её задумывали разработчики.
+    </div>
+    <div style="margin-top: 16px;">
+        <span class="stalker-tag">OGSR Engine</span>
+        <span class="stalker-tag">Сюжетная</span>
+        <span class="stalker-tag">Зона Отчуждения</span>
+        <span class="stalker-tag">HD Graphics</span>
+        <span class="stalker-tag">A-Life 2.0</span>
+    </div>
+</div>
+
+<Row Gutter="16" Style="margin-bottom: 24px;">
+    <Col Span="12" Xs="24" Sm="12">
+        <Card Title="О моде" Bordered="false">
+            <Paragraph>
+                <b>Priboi Story — Eternal OGSR</b> — это переосмысление и развитие оригинальной
+                «Припять-истории» на движке OGSR. Сохранена глубокая сюжетная ветка,
+                добавлены новые фракции, уникальные артефакты и побочные задания.
+                Переработаны баланс, ИИ, поведение НПС и мутантов — Зона стала живее.
+            </Paragraph>
+            <Paragraph>
+                Мод рассчитан на прохождение в 30+ часов. Поддерживается разрешение до 4K,
+                улучшенный звук, новые погодные эффекты и динамическое освещение.
+            </Paragraph>
+        </Card>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <Card Title="Что внутри" Bordered="false">
+            <ul style="padding-left: 20px; line-height: 1.9;">
+                <li>Новая стартовая локация и расширенная Кордон-2</li>
+                <li>Дополнительные квесты для всех фракций</li>
+                <li>Около 30 единиц нового и переработанного оружия</li>
+                <li>HD-текстуры и шейдеры OGSR</li>
+                <li>Полная поддержка русской озвучки</li>
+                <li>Адаптированный A-Life 2.0</li>
+            </ul>
+        </Card>
+    </Col>
+</Row>
+
+<div class="photographer-card">
+    <div class="photographer-avatar">ВК</div>
+    <div class="photographer-info">
+        <h2>Виктор «Линза» Корнилов</h2>
+        <div class="role">📸 Официальный фотограф команды · S.T.A.L.K.E.R. screenshot artist</div>
+        <div class="bio">
+            Делает фирменные скриншоты для модов команды с 2014 года. Каждый кадр —
+            это маленький короткометражный фильм: свет, туман, силуэт сталкера на фоне
+            ЧАЭС. Его работы публиковались в AP-PRO, в тематических журналах и
+            на обложках модов OGSR-линейки. В Priboi Story — Eternal OGSR отвечает
+            за визуальный стиль всех промо-материалов.
+        </div>
+        <div class="photo-gallery">
+            <div class="photo-card" data-caption="Припять · рассвет" style="background-image: url('https://picsum.photos/seed/stalker-1/400/300');"></div>
+            <div class="photo-card" data-caption="Рыжий лес · туман" style="background-image: url('https://picsum.photos/seed/stalker-2/400/300');"></div>
+            <div class="photo-card" data-caption="ЧАЭС · закат" style="background-image: url('https://picsum.photos/seed/stalker-3/400/300');"></div>
+            <div class="photo-card" data-caption="Свалка · ночь" style="background-image: url('https://picsum.photos/seed/stalker-4/400/300');"></div>
+        </div>
+    </div>
+</div>
+
+<Title Level="2" Style="margin-top: 32px;">Отзывы игроков</Title>
+<Paragraph Type="ParagraphType.Secondary">
+    Что говорят сталкеры, прошедшие Priboi Story — Eternal OGSR.
+</Paragraph>
+
+<Row Gutter="16">
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «Один из лучших сюжетных модов, что я видел за последние годы.
+                Сценарий на уровне официальных DLC, а местами и лучше.
+                Финал Припяти просто вынес — сидел в наушниках до утра.»
+            </div>
+            <div class="author">— Сталкер_Кудрявый, форум AP-PRO</div>
+        </div>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «OGSR тут дышит полной грудью. A-Life реально живой — возвращаешься
+                на базу, а там уже трупы, новые торговцы и кто-то с кем-то
+                воюет. Атмосфера — на десятку.»
+            </div>
+            <div class="author">— Макс «Долговец»</div>
+        </div>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «Перепрошёл три раза подряд. Боёвка перетянута идеально:
+                ни одного ощущения, что мод раздут ради хайпа.
+                Каждая находка в Припяти — как маленькая победа.»
+            </div>
+            <div class="author">— ZONA_Forever</div>
+        </div>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «Саундтрек, ambient, шум деревьев и аномалий —
+                я физически чувствую себя в Зоне. Уже за одно это
+                стоит скачать. А тут ещё и сюжет, и контент.»
+            </div>
+            <div class="author">— Ветеран_ЧАЭС</div>
+        </div>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «Сборка стабильная, вылетов почти нет.
+                Авторы реально поддерживают релиз, патчи выходят регулярно.
+                Для OGSR-мода — это эталон качества.»
+            </div>
+            <div class="author">— Бармен из «100 рентген»</div>
+        </div>
+    </Col>
+    <Col Span="12" Xs="24" Sm="12">
+        <div class="review-card">
+            <div class="quote">
+                «Привёл друга, фаната метро и оригинальной трилогии —
+                он прошёл запоем и сразу попросил ещё модов от этой команды.
+                Уровень сценария: ТАКОЙ, каким должен был быть S.T.A.L.K.E.R. 2.»
+            </div>
+            <div class="author">— Командор «Монолита»</div>
+        </div>
+    </Col>
+</Row>
+
+<Title Level="2" Style="margin-top: 32px;">Обзоры и летсплеи</Title>
+<Paragraph Type="ParagraphType.Secondary">
+    Ткни на любую карточку, чтобы открыть летсплей на YouTube.
+</Paragraph>
+
+<Carousel Autoplay="@(System.TimeSpan.FromSeconds(5))">
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D0%B1%D0%B7%D0%BE%D1%80" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-1/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Обзор мода: первые впечатления</h4>
+                    <p>Разбор геймплея, графики и сюжета. Стоит ли ставить в 2026?</p>
+                    <div class="letsplay-meta">📺 YouTube · обзор · 23 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BB%D0%B5%D1%82%D1%81%D0%BF%D0%BB%D0%B5%D0%B9+%D0%BA%D0%BE%D1%80%D0%B4%D0%BE%D0%BD" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-2/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Летсплей: Часть 1 — Кордон</h4>
+                    <p>Начало пути. Первые встречи, первый хабар, первый выстрел.</p>
+                    <div class="letsplay-meta">📺 YouTube · летсплей · 1 ч 12 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BF%D1%80%D0%B8%D0%BF%D1%8F%D1%82%D1%8C+%D1%84%D0%B8%D0%BD%D0%B0%D0%BB" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-3/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Прохождение: Припять</h4>
+                    <p>Финальный рывок сюжета. Без спойлеров — но мурашки гарантированы.</p>
+                    <div class="letsplay-meta">📺 YouTube · прохождение · 47 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D1%80%D1%83%D0%B6%D0%B8%D0%B5+%D0%B3%D0%B0%D0%B9%D0%B4" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-4/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Гайд: лучшее оружие</h4>
+                    <p>Топ-стволы мода, где их найти и как прокачать.</p>
+                    <div class="letsplay-meta">📺 YouTube · гайд · 18 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%B0%D1%82%D0%BC%D0%BE%D1%81%D1%84%D0%B5%D1%80%D0%B0+4k" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-5/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Атмосфера Зоны в 4K</h4>
+                    <p>Чистый эмбиент, скриншоты локаций, закаты на ЧАЭС.</p>
+                    <div class="letsplay-meta">📺 YouTube · ambient · 35 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+    <CarouselSlick>
+        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D0%B1%D0%B7%D0%BE%D1%80+%D0%BF%D0%BB%D1%8E%D1%81%D1%8B+%D0%BC%D0%B8%D0%BD%D1%83%D1%81%D1%8B" target="_blank" rel="noopener">
+            <div class="letsplay-card">
+                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-6/800/450');"></div>
+                <div class="letsplay-body">
+                    <h4>Плюсы и минусы мода</h4>
+                    <p>Честный разбор без фанатизма — что зашло, что нет.</p>
+                    <div class="letsplay-meta">📺 YouTube · разбор · 28 мин</div>
+                </div>
+            </div>
+        </a>
+    </CarouselSlick>
+</Carousel>
+
+<Divider />
+
+<Paragraph Type="ParagraphType.Secondary" Style="text-align: center; margin-top: 16px;">
+    Тема мода на форуме:
+    <a href="https://ap-pro.ru/forums/topic/2963-priboi-story-%E2%80%94-eternal-ogsr/" target="_blank" rel="noopener">
+        ap-pro.ru — Priboi Story — Eternal OGSR
+    </a>
+</Paragraph>

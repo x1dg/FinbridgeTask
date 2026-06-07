@@ -82,17 +82,18 @@ services:
     networks:
       - finbridge-net
 
-  web:
+  backoffice:
     build:
       context: .
-      dockerfile: Finbridge.Web/Dockerfile
-    container_name: finbridge-web
+      dockerfile: Finbridge.Backoffice/Dockerfile
+    container_name: finbridge-backoffice
     depends_on:
-      - api
+      postgres:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
-      ApiSettings__BaseUrl: "http://api:8080"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=finbridge;Username=postgres;Password=postgres"
     ports:
       - "5000:8080"
     networks:

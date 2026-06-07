@@ -4,5 +4,5 @@
   <Project Path="Finbridge.Data/Finbridge.Data.csproj" />
   <Project Path="Finbridge.Domain/Finbridge.Domain.csproj" />
   <Project Path="Finbridge.Tests/Finbridge.Tests.csproj" />
-  <Project Path="Finbridge.Web/Finbridge.Web.csproj" />
+  <Project Path="Finbridge.Backoffice/Finbridge.Backoffice.csproj" />
 </Solution>

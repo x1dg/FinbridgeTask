@@ -1,0 +1,37 @@
+@page "/"
+@namespace Finbridge.Backoffice.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finbridge Backoffice</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="_content/AntDesign/css/ant-design-blazor.css" />
+    <link rel="stylesheet" href="css/site.css" />
+</head>
+<body>
+    <app>
+        <component type="typeof(Finbridge.Backoffice.App)" render-mode="ServerPrerendered" />
+    </app>
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            Произошла ошибка. Перезагрузите страницу.
+        </environment>
+        <environment include="Development">
+            Произошла ошибка. См. вывод в браузере.
+        </environment>
+        <a href="" class="reload">Перезагрузить</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_content/AntDesign/js/ant-design-blazor.js"></script>
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>
