@@ -94,6 +94,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=finbridge;Username=postgres;Password=postgres"
+      BalanceSettings__MaxBalance: "1000000"
     ports:
       - "5000:8080"
     networks:

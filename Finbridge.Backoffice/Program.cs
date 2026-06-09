@@ -1,9 +1,12 @@
 using AntDesign;
 using Finbridge.Application;
+using Finbridge.Application.Configuration;
 using Finbridge.Data;
 using Finbridge.Backoffice.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<BalanceSettings>(builder.Configuration.GetSection("BalanceSettings"));
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
