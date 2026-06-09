@@ -32,11 +32,14 @@ public sealed class ExceptionHandlingMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Необработанное исключение при выполнении запроса.");
-            await HandleExceptionAsync(context, ex);
+            if (!context.Response.HasStarted)
+            {
+                await HandleExceptionAsync(context, ex, _env);
+            }
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception, IHostEnvironment env)
     {
         var code = exception switch
         {
@@ -44,20 +47,23 @@ public sealed class ExceptionHandlingMiddleware
             KeyNotFoundException => HttpStatusCode.NotFound,
             NegativeBalanceException => HttpStatusCode.BadRequest,
             BalanceLimitExceededException => HttpStatusCode.BadRequest,
+            ConcurrencyConflictException => HttpStatusCode.Conflict,
             ArgumentException => HttpStatusCode.BadRequest,
             InvalidOperationException => HttpStatusCode.BadRequest,
             _ => HttpStatusCode.InternalServerError
         };
 
-        var result = JsonSerializer.Serialize(new
+        var payload = new
         {
             error = new
             {
                 message = exception.Message,
-                detail = exception.InnerException?.Message,
+                detail = env.IsDevelopment() ? exception.InnerException?.Message : null,
                 type = exception.GetType().Name
             }
-        });
+        };
+
+        var result = JsonSerializer.Serialize(payload);
 
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = (int)code;

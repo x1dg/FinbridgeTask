@@ -60,14 +60,7 @@ public sealed class OutboxRelayService : BackgroundService
             .GetServices<IOutboxPublisher>()
             .ToDictionary(p => p.MessageType);
 
-        var pending = await context.OutboxMessages
-            .Where(m => m.ProcessedAt == null && m.RetryCount < MaxRetries)
-            .OrderBy(m => m.OccurredOn)
-            .Take(BatchSize)
-            .ToListAsync(cancellationToken);
-
-        var remaining = await context.OutboxMessages.CountAsync(m => m.ProcessedAt == null, cancellationToken);
-        OutboxTelemetry.SetPendingCount(remaining);
+        var pending = await ClaimPendingMessagesAsync(context, BatchSize, MaxRetries, cancellationToken);
 
         if (pending.Count == 0)
         {
@@ -120,5 +113,31 @@ public sealed class OutboxRelayService : BackgroundService
         {
             _logger.LogDebug("Outbox relay: обработано {Processed}, с ошибкой {Failed}.", processed, failed);
         }
+    }
+
+    private static async Task<List<OutboxMessage>> ClaimPendingMessagesAsync(
+        FinbridgeDbContext context,
+        int batchSize,
+        int maxRetries,
+        CancellationToken cancellationToken)
+    {
+        if (context.Database.IsNpgsql())
+        {
+            return await context.OutboxMessages
+                .FromSqlRaw(
+                    "SELECT * FROM outbox_messages " +
+                    "WHERE \"ProcessedAt\" IS NULL AND \"RetryCount\" < {0} " +
+                    "ORDER BY \"OccurredOn\" " +
+                    "LIMIT {1} " +
+                    "FOR UPDATE SKIP LOCKED",
+                    maxRetries, batchSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        return await context.OutboxMessages
+            .Where(m => m.ProcessedAt == null && m.RetryCount < maxRetries)
+            .OrderBy(m => m.OccurredOn)
+            .Take(batchSize)
+            .ToListAsync(cancellationToken);
     }
 }

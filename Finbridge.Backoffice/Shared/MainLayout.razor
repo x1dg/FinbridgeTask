@@ -1,40 +1,65 @@
 @inherits LayoutComponentBase
+@inject Services.ThemeService ThemeService
 @inject WeatherService Weather
 @implements IDisposable
 
 <Layout Style="min-height: 100vh;">
-    <Header Style="background: #001529; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-wrap: wrap; gap: 12px;">
-        <div style="color: #fff; font-size: 20px; font-weight: 600;">
-            💰 Finbridge Backoffice
+    <Header Style="background: var(--bg-header); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border);">
+        <div style="color: var(--text-heading); font-size: 20px; font-weight: 600; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">&#x1F4B0;</span>
+            <span>Finbridge Backoffice</span>
         </div>
-        @if (_weather is not null)
-        {
-            <div style="color: #fff; display: flex; align-items: center; gap: 14px; font-size: 13px; flex-wrap: wrap;">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size: 22px;" title="@_weather.Description">@_weather.Icon</span>
-                    <b>@_weather.TemperatureDisplay</b>
-                    <span style="color: #c9c9c9;">@_weather.Description</span>
-                </span>
-                <span style="color: #555;">|</span>
-                <span title="Восход">🌅 @_weather.SunriseDisplay</span>
-                <span title="Закат">🌇 @_weather.SunsetDisplay</span>
-                <span style="color: #555;">|</span>
-                <span title="Полнолуние">@_weather.MoonDisplay</span>
-                <span style="color: #555;">|</span>
-                <span style="color: #c9c9c9;">📍 @_weather.City</span>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            @if (_weather is not null)
+            {
+                <div style="color: var(--text-primary); display: flex; align-items: center; gap: 14px; font-size: 13px; flex-wrap: wrap;">
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 22px;" title="@_weather.Description">@_weather.Icon</span>
+                        <b>@_weather.TemperatureDisplay</b>
+                        <span style="color: var(--text-muted);">@_weather.Description</span>
+                    </span>
+                    <span style="color: var(--border);">|</span>
+                    <span title="Восход">&#x1F305; @_weather.SunriseDisplay</span>
+                    <span title="Закат">&#x1F307; @_weather.SunsetDisplay</span>
+                    <span style="color: var(--border);">|</span>
+                    <span title="Полнолуние">@_weather.MoonDisplay</span>
+                    <span style="color: var(--border);">|</span>
+                    <span style="color: var(--text-muted);">&#x1F4CD; @_weather.City</span>
+                </div>
+            }
+            <div class="theme-picker" @onclick:preventDefault>
+                <Dropdown Trigger="@(new Trigger[] { Trigger.Click })">
+                    <Overlay>
+                        <Menu SelectedKeys="@(new[] { ThemeService.Current })">
+                            @foreach (var theme in ThemeService.Themes)
+                            {
+                                <MenuItem Key="@theme.Id" OnClick="() => ChangeTheme(theme.Id)">
+                                    <span style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="theme-dot" style="background: @theme.Color;"></span>
+                                        <span>@theme.Name</span>
+                                        <span style="color: var(--text-muted); font-size: 11px; margin-left: 4px;">@theme.Mode</span>
+                                    </span>
+                                </MenuItem>
+                            }
+                        </Menu>
+                    </Overlay>
+                    <ChildContent>
+                        <span style="cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-input); color: var(--text-primary); font-size: 13px; transition: background 0.2s;">
+                            <span class="theme-dot" style="background: @ThemeService.Themes.First(t => t.Id == ThemeService.Current).Color;"></span>
+                            <span>@ThemeService.Themes.First(t => t.Id == ThemeService.Current).Name</span>
+                            <span style="font-size: 10px; opacity: 0.6;">&#9662;</span>
+                        </span>
+                    </ChildContent>
+                </Dropdown>
             </div>
-        }
-        else if (_weatherLoading)
-        {
-            <Spin Size="small" />
-        }
+        </div>
     </Header>
     <Layout>
-        <Sider Width="220" Theme="SiderTheme.Light" Style="border-right: 1px solid #f0f0f0;">
+        <Sider Width="220" Theme="SiderTheme.Light" class="theme-sider" Style="background: var(--bg-sider);">
             <NavMenu />
         </Sider>
-        <Layout Style="padding: 24px; background: #f5f5f5;">
-            <Content Style="background: #fff; padding: 24px; border-radius: 8px; min-height: calc(100vh - 112px - 48px);">
+        <Layout Style="padding: 24px; background: var(--bg-content);">
+            <Content Style="background: var(--bg-card); padding: 24px; border-radius: 8px; min-height: calc(100vh - 112px - 48px); border: 1px solid var(--border);">
                 @Body
             </Content>
         </Layout>
@@ -43,29 +68,29 @@
 
 @code {
     private WeatherInfo? _weather;
-    private bool _weatherLoading = true;
-    private CancellationTokenSource? _cts;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        _cts = new CancellationTokenSource();
-        try
+        ThemeService.Subscribe(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
         {
-            _weather = await Weather.GetCurrentAsync("Москва", _cts.Token);
+            await ThemeService.InitAsync();
+            _weather = await Weather.GetCurrentAsync("Москва");
+            StateHasChanged();
         }
-        catch
-        {
-            // ignore
-        }
-        finally
-        {
-            _weatherLoading = false;
-        }
+    }
+
+    private async Task ChangeTheme(string themeId)
+    {
+        await ThemeService.SetThemeAsync(themeId);
     }
 
     public void Dispose()
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
+        ThemeService.Unsubscribe(StateHasChanged);
     }
 }

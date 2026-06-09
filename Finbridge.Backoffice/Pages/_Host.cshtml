@@ -6,14 +6,39 @@
 }
 
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="lavender">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Finbridge Backoffice</title>
     <base href="~/" />
     <link rel="stylesheet" href="_content/AntDesign/css/ant-design-blazor.css" />
+    <link rel="stylesheet" href="css/themes.css" />
     <link rel="stylesheet" href="css/site.css" />
+    <script>
+        window.themeStorage = {
+            KEY: 'finbridge-theme',
+            get: function () {
+                try { return localStorage.getItem(this.KEY); }
+                catch (e) { return null; }
+            },
+            set: function (val) {
+                try { localStorage.setItem(this.KEY, val); }
+                catch (e) { }
+            }
+        };
+        window.themeApply = {
+            apply: function (themeId) {
+                document.documentElement.setAttribute('data-theme', themeId);
+            }
+        };
+        (function () {
+            var saved = window.themeStorage.get();
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+        })();
+    </script>
 </head>
 <body>
     <app>
@@ -28,7 +53,7 @@
             Произошла ошибка. См. вывод в браузере.
         </environment>
         <a href="" class="reload">Перезагрузить</a>
-        <a class="dismiss">🗙</a>
+        <a class="dismiss">&#x274C;</a>
     </div>
 
     <script src="_content/AntDesign/js/ant-design-blazor.js"></script>

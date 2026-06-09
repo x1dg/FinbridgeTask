@@ -1,11 +1,8 @@
 using System.Diagnostics;
-using Finbridge.Api.Resilience;
 using Finbridge.Api.Services;
 using Finbridge.Data.Outbox;
 using Finbridge.Domain.Users.Events;
 using Microsoft.Extensions.Options;
-using Polly;
-using Polly.Registry;
 
 namespace Finbridge.Api.Outbox;
 
@@ -15,19 +12,16 @@ public sealed class BalanceUpdatedOutboxPublisher : IOutboxPublisher
 
     private readonly IKafkaProducer _producer;
     private readonly KafkaSettings _settings;
-    private readonly ResiliencePipeline _pipeline;
 
     public BalanceUpdatedOutboxPublisher(
         IKafkaProducer producer,
-        IOptions<KafkaSettings> settings,
-        ResiliencePipelineProvider<string> pipelineProvider)
+        IOptions<KafkaSettings> settings)
     {
         _producer = producer;
         _settings = settings.Value;
-        _pipeline = pipelineProvider.GetPipeline(ResiliencePipelines.KafkaProducer);
     }
 
-    public ValueTask PublishAsync(OutboxMessage message, CancellationToken cancellationToken)
+    public async ValueTask PublishAsync(OutboxMessage message, CancellationToken cancellationToken)
     {
         using var activity = OutboxTelemetry.ActivitySource.StartActivity("outbox.publish", ActivityKind.Producer);
         if (activity is not null)
@@ -39,8 +33,17 @@ public sealed class BalanceUpdatedOutboxPublisher : IOutboxPublisher
             activity.SetTag("outbox.retry.count", message.RetryCount);
         }
 
-        return _pipeline.ExecuteAsync(
-            async ct => await _producer.ProduceAsync(_settings.Topic, message.Payload, ct),
-            cancellationToken);
+        try
+        {
+            await _producer.ProduceAsync(_settings.Topic, message.Payload, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            if (activity is not null)
+            {
+                activity.SetStatus(ActivityStatusCode.Error, ex.Message);
+            }
+            throw;
+        }
     }
 }

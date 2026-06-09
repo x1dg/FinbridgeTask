@@ -68,30 +68,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SigningKey)),
             ClockSkew = TimeSpan.FromMinutes(1)
         };
-        options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
-        {
-            OnAuthenticationFailed = ctx =>
-            {
-                var logger = ctx.HttpContext.RequestServices
-                    .GetRequiredService<ILoggerFactory>()
-                    .CreateLogger("Finbridge.Api.JwtAuth");
-                logger.LogWarning(
-                    "JWT auth FAILED: {ExceptionType}: {Message}",
-                    ctx.Exception.GetType().Name, ctx.Exception.Message);
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = ctx =>
-            {
-                var logger = ctx.HttpContext.RequestServices
-                    .GetRequiredService<ILoggerFactory>()
-                    .CreateLogger("Finbridge.Api.JwtAuth");
-                logger.LogInformation(
-                    "JWT auth OK for {Path}: sub={Sub}",
-                    ctx.HttpContext.Request.Path,
-                    ctx.Principal?.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value ?? "?");
-                return Task.CompletedTask;
-            }
-        };
     });
 builder.Services.AddAuthorization();
 
@@ -165,8 +141,8 @@ builder.Services.AddResiliencePipeline(ResiliencePipelines.KafkaProducer, (pipel
         });
 });
 
-builder.Services.AddScoped<KafkaProducer>();
-builder.Services.AddScoped<IKafkaProducer>(sp =>
+builder.Services.AddSingleton<KafkaProducer>();
+builder.Services.AddSingleton<IKafkaProducer>(sp =>
     new ResilientKafkaProducer(
         sp.GetRequiredService<KafkaProducer>(),
         sp.GetRequiredService<ResiliencePipelineProvider<string>>()));
@@ -229,11 +205,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseExceptionHandling();
 app.UseRateLimiter();

@@ -45,9 +45,12 @@ else
                     @context.Balance.ToString("N2")
                 </Tag>
             </Column>
-            <Column TData="UserResponse" Title="Действия" Width="220">
+            <Column TData="UserResponse" Title="Действия" Width="280">
+                <Button Size="small" Type="@ButtonType.Link" OnClick="@(() => ShowBalanceModal(context))">
+                    Изменить баланс
+                </Button>
                 <Button Size="small" Type="@ButtonType.Link" OnClick="@(() => NavigateToHistory(context.Id))">
-                    <Icon Type="history" /> История баланса
+                    История баланса
                 </Button>
             </Column>
         </ChildContent>
@@ -71,9 +74,46 @@ else
                         Style="width: 100%;" />
         </FormItem>
         <FormItem Label="Место рождения" Required>
-            <Input @bind-Value="@_newUser.PlaceOfBirth" Placeholder="г. Москва" />
+            <AutoComplete @bind-Value="@_newUser.PlaceOfBirth"
+                          Options="@_cityOptions"
+                          Placeholder="Начните вводить город..."
+                          OnSelectionChange="OnCitySelected"
+                          Style="width: 100%;" />
         </FormItem>
     </Form>
+</Modal>
+
+<Modal Title="@($"Изменение баланса — {_balanceUser?.FullName}")"
+       Visible="@_balanceModalVisible"
+       OnOk="@(async () => await HandleBalanceAsync())"
+       OnCancel="@(() => _balanceModalVisible = false)"
+       ConfirmLoading="@_balanceLoading">
+    @if (_balanceUser is not null)
+    {
+        <div style="margin-bottom: 16px;">
+            <Text>Текущий баланс: </Text>
+            <Tag Color="@(_balanceUser.Balance >= 0 ? "green" : "red")" Style="font-size: 16px; font-weight: 600;">
+                @_balanceUser.Balance.ToString("N2")
+            </Tag>
+        </div>
+        <Form Model="@_balanceForm" Layout="@FormLayout.Vertical">
+            <FormItem Label="Сумма (+ пополнение, - списание)" Required>
+                <AntDesign.InputNumber @bind-Value="@_balanceForm.Amount"
+                             Style="width: 100%;"
+                             Step="100"
+                             Min="-1000000"
+                             Max="1000000"
+                             Placeholder="0.00" />
+            </FormItem>
+            @if (_balanceError is not null)
+            {
+                <Alert Type="@AlertType.Error"
+                       Message="@_balanceError"
+                       ShowIcon="true"
+                       Style="margin-bottom: 16px;" />
+            }
+        </Form>
+    }
 </Modal>
 
 @code {
@@ -84,6 +124,30 @@ else
     private bool _createModalVisible;
     private bool _createLoading;
     private CreateUserForm _newUser = new();
+
+    private bool _balanceModalVisible;
+    private bool _balanceLoading;
+    private UserResponse? _balanceUser;
+    private BalanceForm _balanceForm = new();
+    private string? _balanceError;
+
+    private static readonly DateTime DefaultDob = new(1999, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    private readonly List<string> _cityOptions = new()
+    {
+        "Москва", "Санкт-Петербург", "Новосибирск", "Екатеринбург", "Казань",
+        "Нижний Новгород", "Челябинск", "Самара", "Омск", "Ростов-на-Дону",
+        "Уфа", "Красноярск", "Воронеж", "Пермь", "Волгоград",
+        "Краснодар", "Саратов", "Тюмень", "Тольятти", "Ижевск",
+        "Барнаул", "Иркутск", "Хабаровск", "Владивосток", "Махачкала",
+        "Томск", "Оренбург", "Кемерово", "Новокузнецк", "Рязань",
+        "Астрахань", "Набережные Челны", "Пенза", "Липецк", "Калининград",
+        "Тула", "Киров", "Сочи", "Мурманск", "Сургут",
+        "Владимир", "Смоленск", "Волжский", "Курган", "Мытищи",
+        "Тверь", "Иваново", "Брянск", "Стерлитамак", "Магнитогорск",
+        "Ярославль", "Ульяновск", "Орёл", "Кострома", "Нижний Тагил",
+        "Петрозаводск", "Владикавказ", "Грозный", "Чита", "Нижневартовск"
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,8 +173,14 @@ else
 
     private void ShowCreateModal()
     {
-        _newUser = new() { DateOfBirth = DateTime.Today.AddYears(-25) };
+        _newUser = new() { DateOfBirth = DefaultDob };
         _createModalVisible = true;
+    }
+
+    private void OnCitySelected(object? value)
+    {
+        if (value is string city)
+            _newUser.PlaceOfBirth = city;
     }
 
     private async Task HandleCreateAsync()
@@ -142,6 +212,60 @@ else
         }
     }
 
+    private void ShowBalanceModal(UserResponse user)
+    {
+        _balanceUser = user;
+        _balanceForm = new BalanceForm { Amount = 0 };
+        _balanceError = null;
+        _balanceModalVisible = true;
+    }
+
+    private async Task HandleBalanceAsync()
+    {
+        _balanceError = null;
+
+        if (_balanceUser is null) return;
+
+        if (_balanceForm.Amount == 0)
+        {
+            _balanceError = "Сумма не может быть нулевой.";
+            return;
+        }
+
+        var newBalance = _balanceUser.Balance + _balanceForm.Amount;
+        if (newBalance < 0)
+        {
+            _balanceError = $"Операция приведёт к отрицательному балансу ({newBalance:N2}). Баланс: {_balanceUser.Balance:N2}, списание: {_balanceForm.Amount:N2}.";
+            return;
+        }
+
+        if (newBalance > 1_000_000)
+        {
+            _balanceError = $"Баланс превысит максимум (1 000 000). Текущий: {_balanceUser.Balance:N2}, итого: {newBalance:N2}.";
+            return;
+        }
+
+        _balanceLoading = true;
+        try
+        {
+            var updated = await Dispatcher.SendAsync(new UpdateBalanceRequest(_balanceUser.Id, _balanceForm.Amount));
+            var msg = _balanceForm.Amount > 0
+                ? $"Пополнено на {_balanceForm.Amount:N2}. Новый баланс: {updated.Balance:N2}"
+                : $"Списано {Math.Abs(_balanceForm.Amount):N2}. Новый баланс: {updated.Balance:N2}";
+            await MessageService.Success(msg);
+            _balanceModalVisible = false;
+            await LoadUsersAsync();
+        }
+        catch (Exception ex)
+        {
+            _balanceError = $"Ошибка: {ex.Message}";
+        }
+        finally
+        {
+            _balanceLoading = false;
+        }
+    }
+
     private void NavigateToHistory(int userId) => Navigation.NavigateTo($"/balance-history/{userId}");
 
     private sealed class CreateUserForm
@@ -149,5 +273,10 @@ else
         public string FullName { get; set; } = string.Empty;
         public DateTime? DateOfBirth { get; set; }
         public string PlaceOfBirth { get; set; } = string.Empty;
+    }
+
+    private sealed class BalanceForm
+    {
+        public decimal Amount { get; set; }
     }
 }

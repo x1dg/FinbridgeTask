@@ -1,7 +1,7 @@
 using AntDesign;
 using Finbridge.Application;
 using Finbridge.Data;
-
+using Finbridge.Backoffice.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +12,8 @@ builder.Services.AddAntDesign();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<Finbridge.Backoffice.Services.WeatherService>();
+builder.Services.AddScoped<WeatherService>();
+builder.Services.AddScoped<ThemeService>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("ConnectionStrings:DefaultConnection is not configured.");

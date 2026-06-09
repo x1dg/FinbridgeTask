@@ -29,26 +29,25 @@
 }
 else
 {
-    <Table TItem="BalanceHistoryResponse"
+    <Table TItem="HistoryRow"
            DataSource="@_history"
            Size="TableSize.Middle"
            Bordered
            Loading="_loading">
         <ChildContent>
             <Column TData="int" Title="#" Width="80">
-                @{ var i = _history.ToList().IndexOf(context) + 1; }
-                @i
+                @context.Index
             </Column>
-            <Column TData="decimal" Title="Изменение" DataIndex="@nameof(BalanceHistoryResponse.AmountChanged)">
-                @context.AmountChanged.ToString("N2")
+            <Column TData="decimal" Title="Изменение">
+                @context.Row.AmountChanged.ToString("N2")
             </Column>
-            <Column TData="decimal" Title="Новый баланс" DataIndex="@nameof(BalanceHistoryResponse.NewBalance)">
-                <Tag Color="@(context.NewBalance >= 0 ? "green" : "red")">
-                    @context.NewBalance.ToString("N2")
+            <Column TData="decimal" Title="Новый баланс">
+                <Tag Color="@(context.Row.NewBalance >= 0 ? "green" : "red")">
+                    @context.Row.NewBalance.ToString("N2")
                 </Tag>
             </Column>
-            <Column TData="DateTime" Title="Дата и время" DataIndex="@nameof(BalanceHistoryResponse.ChangedAt)">
-                @context.ChangedAt.ToLocalTime().ToString("g")
+            <Column TData="DateTime" Title="Дата и время">
+                @context.Row.ChangedAt.ToLocalTime().ToString("g")
             </Column>
         </ChildContent>
     </Table>
@@ -57,7 +56,7 @@ else
 @code {
     [Parameter] public int UserId { get; set; }
 
-    private IReadOnlyList<BalanceHistoryResponse> _history = Array.Empty<BalanceHistoryResponse>();
+    private IReadOnlyList<HistoryRow> _history = Array.Empty<HistoryRow>();
     private bool _loading = true;
 
     protected override async Task OnParametersSetAsync()
@@ -70,7 +69,8 @@ else
         _loading = true;
         try
         {
-            _history = await Dispatcher.SendAsync(new GetBalanceHistoryQuery(UserId, Limit: 100));
+            var items = await Dispatcher.SendAsync(new GetBalanceHistoryQuery(UserId, Limit: 20));
+            _history = items.Select((r, i) => new HistoryRow(r, i + 1)).ToList();
         }
         catch (Exception ex)
         {
@@ -81,4 +81,6 @@ else
             _loading = false;
         }
     }
+
+    private sealed record HistoryRow(BalanceHistoryResponse Row, int Index);
 }

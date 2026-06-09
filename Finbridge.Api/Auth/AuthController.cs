@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Finbridge.Application.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -10,6 +11,7 @@ namespace Finbridge.Api.Auth;
 
 [ApiController]
 [Route("api/auth")]
+[EnableRateLimiting("fixed")]
 public sealed class AuthController : ControllerBase
 {
     private readonly JwtSettings _settings;

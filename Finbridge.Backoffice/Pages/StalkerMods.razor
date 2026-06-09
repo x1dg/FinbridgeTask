@@ -80,9 +80,10 @@
     .letsplay-thumb {
         position: relative;
         height: 200px;
+        background-color: #1a1a1a;
         background-size: cover;
         background-position: center;
-        background-color: #1a1a1a;
+        overflow: hidden;
     }
     .letsplay-thumb::after {
         content: "▶";
@@ -101,6 +102,7 @@
         justify-content: center;
         padding-left: 6px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        z-index: 2;
     }
     .letsplay-body {
         padding: 16px;
@@ -118,74 +120,6 @@
         color: #888 !important;
         font-size: 12px !important;
         margin-top: 8px !important;
-    }
-    .photographer-card {
-        background: linear-gradient(135deg, #2d1810 0%, #1a1a1a 100%);
-        color: #e8d8b8;
-        border-radius: 12px;
-        padding: 32px;
-        margin-bottom: 24px;
-        display: flex;
-        gap: 32px;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    .photographer-avatar {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #ff8c00 0%, #d35400 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 56px;
-        color: #1a1a1a;
-        font-weight: 700;
-        flex-shrink: 0;
-        box-shadow: 0 8px 24px rgba(255, 140, 0, 0.3);
-    }
-    .photographer-info {
-        flex: 1;
-        min-width: 280px;
-    }
-    .photographer-info h2 {
-        color: #ff8c00 !important;
-        margin: 0 0 8px 0 !important;
-    }
-    .photographer-info .role {
-        color: #c9b896;
-        font-size: 14px;
-        margin-bottom: 12px;
-    }
-    .photographer-info .bio {
-        color: #e8d8b8;
-        line-height: 1.6;
-        font-size: 14px;
-    }
-    .photo-gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 12px;
-        margin-top: 16px;
-    }
-    .photo-card {
-        height: 160px;
-        background-size: cover;
-        background-position: center;
-        border-radius: 8px;
-        position: relative;
-        overflow: hidden;
-    }
-    .photo-card::after {
-        content: attr(data-caption);
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 100%);
-        color: #fff;
-        padding: 24px 12px 10px;
-        font-size: 12px;
     }
 </style>
 
@@ -233,27 +167,6 @@
         </Card>
     </Col>
 </Row>
-
-<div class="photographer-card">
-    <div class="photographer-avatar">ВК</div>
-    <div class="photographer-info">
-        <h2>Виктор «Линза» Корнилов</h2>
-        <div class="role">📸 Официальный фотограф команды · S.T.A.L.K.E.R. screenshot artist</div>
-        <div class="bio">
-            Делает фирменные скриншоты для модов команды с 2014 года. Каждый кадр —
-            это маленький короткометражный фильм: свет, туман, силуэт сталкера на фоне
-            ЧАЭС. Его работы публиковались в AP-PRO, в тематических журналах и
-            на обложках модов OGSR-линейки. В Priboi Story — Eternal OGSR отвечает
-            за визуальный стиль всех промо-материалов.
-        </div>
-        <div class="photo-gallery">
-            <div class="photo-card" data-caption="Припять · рассвет" style="background-image: url('https://picsum.photos/seed/stalker-1/400/300');"></div>
-            <div class="photo-card" data-caption="Рыжий лес · туман" style="background-image: url('https://picsum.photos/seed/stalker-2/400/300');"></div>
-            <div class="photo-card" data-caption="ЧАЭС · закат" style="background-image: url('https://picsum.photos/seed/stalker-3/400/300');"></div>
-            <div class="photo-card" data-caption="Свалка · ночь" style="background-image: url('https://picsum.photos/seed/stalker-4/400/300');"></div>
-        </div>
-    </div>
-</div>
 
 <Title Level="2" Style="margin-top: 32px;">Отзывы игроков</Title>
 <Paragraph Type="ParagraphType.Secondary">
@@ -328,80 +241,80 @@
     Ткни на любую карточку, чтобы открыть летсплей на YouTube.
 </Paragraph>
 
-<Carousel Autoplay="@(System.TimeSpan.FromSeconds(5))">
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D0%B1%D0%B7%D0%BE%D1%80" target="_blank" rel="noopener">
+<Row Gutter="16">
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=2Ot0dVWRjsg" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-1/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/2Ot0dVWRjsg/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Обзор мода: первые впечатления</h4>
-                    <p>Разбор геймплея, графики и сюжета. Стоит ли ставить в 2026?</p>
-                    <div class="letsplay-meta">📺 YouTube · обзор · 23 мин</div>
+                    <h4>Priboi Story — Eternal OGSR</h4>
+                    <p>Обзор мода: геймплей, графика и сюжет. Стоит ли ставить?</p>
+                    <div class="letsplay-meta">YouTube · обзор</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BB%D0%B5%D1%82%D1%81%D0%BF%D0%BB%D0%B5%D0%B9+%D0%BA%D0%BE%D1%80%D0%B4%D0%BE%D0%BD" target="_blank" rel="noopener">
+    </Col>
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=4dKcKTE9UN4" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-2/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/4dKcKTE9UN4/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Летсплей: Часть 1 — Кордон</h4>
-                    <p>Начало пути. Первые встречи, первый хабар, первый выстрел.</p>
-                    <div class="letsplay-meta">📺 YouTube · летсплей · 1 ч 12 мин</div>
+                    <h4>Интерактив: Прибой на OGSR</h4>
+                    <p>Интерактивный обзор с элементами летсплея.</p>
+                    <div class="letsplay-meta">YouTube · летсплей</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BF%D1%80%D0%B8%D0%BF%D1%8F%D1%82%D1%8C+%D1%84%D0%B8%D0%BD%D0%B0%D0%BB" target="_blank" rel="noopener">
+    </Col>
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=9hdYRjs5rx4" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-3/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/9hdYRjs5rx4/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Прохождение: Припять</h4>
-                    <p>Финальный рывок сюжета. Без спойлеров — но мурашки гарантированы.</p>
-                    <div class="letsplay-meta">📺 YouTube · прохождение · 47 мин</div>
+                    <h4>Полное прохождение</h4>
+                    <p>Весь сюжет от начала до конца. Без спойлеров — но мурашки гарантированы.</p>
+                    <div class="letsplay-meta">YouTube · прохождение</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D1%80%D1%83%D0%B6%D0%B8%D0%B5+%D0%B3%D0%B0%D0%B9%D0%B4" target="_blank" rel="noopener">
+    </Col>
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=VSsvSkm02oU" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-4/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/VSsvSkm02oU/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Гайд: лучшее оружие</h4>
-                    <p>Топ-стволы мода, где их найти и как прокачать.</p>
-                    <div class="letsplay-meta">📺 YouTube · гайд · 18 мин</div>
+                    <h4>OGSR: оружейный пак</h4>
+                    <p>Обзор оружия и модификаций на движке OGSR.</p>
+                    <div class="letsplay-meta">YouTube · обзор</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%B0%D1%82%D0%BC%D0%BE%D1%81%D1%84%D0%B5%D1%80%D0%B0+4k" target="_blank" rel="noopener">
+    </Col>
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=PbSvOYzEfU4" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-5/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/PbSvOYzEfU4/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Атмосфера Зоны в 4K</h4>
-                    <p>Чистый эмбиент, скриншоты локаций, закаты на ЧАЭС.</p>
-                    <div class="letsplay-meta">📺 YouTube · ambient · 35 мин</div>
+                    <h4>Narodnaya Solyanka OGSR</h4>
+                    <p>Прохождение одного из самых массивных модов на OGSR.</p>
+                    <div class="letsplay-meta">YouTube · летсплей</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-    <CarouselSlick>
-        <a class="letsplay-link" href="https://www.youtube.com/results?search_query=priboi+story+eternal+ogsr+%D0%BE%D0%B1%D0%B7%D0%BE%D1%80+%D0%BF%D0%BB%D1%8E%D1%81%D1%8B+%D0%BC%D0%B8%D0%BD%D1%83%D1%81%D1%8B" target="_blank" rel="noopener">
+    </Col>
+    <Col Span="8" Xs="24" Sm="12" Md="8">
+        <a class="letsplay-link" href="https://www.youtube.com/watch?v=spJRtR21thc" target="_blank" rel="noopener">
             <div class="letsplay-card">
-                <div class="letsplay-thumb" style="background-image: url('https://picsum.photos/seed/stalker-lp-6/800/450');"></div>
+                <div class="letsplay-thumb" style="background-image: url('https://img.youtube.com/vi/spJRtR21thc/mqdefault.jpg');"></div>
                 <div class="letsplay-body">
-                    <h4>Плюсы и минусы мода</h4>
-                    <p>Честный разбор без фанатизма — что зашло, что нет.</p>
-                    <div class="letsplay-meta">📺 YouTube · разбор · 28 мин</div>
+                    <h4>Прохождение OGSR Mod</h4>
+                    <p>Играем пистолетом — чистый навык и атмосфера Зоны.</p>
+                    <div class="letsplay-meta">YouTube · летсплей</div>
                 </div>
             </div>
         </a>
-    </CarouselSlick>
-</Carousel>
+    </Col>
+</Row>
 
 <Divider />
 

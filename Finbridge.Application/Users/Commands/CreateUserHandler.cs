@@ -17,9 +17,13 @@ public sealed class CreateUserHandler : IRequestHandler<CreateUserRequest, UserR
 
     public async Task<UserResponse> HandleAsync(CreateUserRequest request, CancellationToken cancellationToken = default)
     {
+        var dob = request.DateOfBirth.Kind == DateTimeKind.Utc
+            ? request.DateOfBirth
+            : request.DateOfBirth.ToUniversalTime();
+
         var user = User.NewUser(
             FullName.Of(request.FullName),
-            request.DateOfBirth,
+            dob,
             request.PlaceOfBirth);
 
         await _userRepository.AddAsync(user, cancellationToken);

@@ -2,14 +2,18 @@ using Finbridge.Application.Abstractions;
 using Finbridge.Application.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Finbridge.Api.Controllers;
 
 [ApiController]
 [Authorize]
+[EnableRateLimiting("fixed")]
 [Route("api/[controller]")]
 public sealed class BalancesController : ControllerBase
 {
+    private const int MaxHistoryLimit = 100;
+
     private readonly IRequestDispatcher _dispatcher;
 
     public BalancesController(IRequestDispatcher dispatcher)
@@ -41,6 +45,7 @@ public sealed class BalancesController : ControllerBase
         [FromQuery] int limit = 20,
         CancellationToken cancellationToken = default)
     {
+        limit = Math.Clamp(limit, 1, MaxHistoryLimit);
         var history = await _dispatcher.SendAsync(new GetBalanceHistoryQuery(userId, limit), cancellationToken);
         return Ok(history);
     }

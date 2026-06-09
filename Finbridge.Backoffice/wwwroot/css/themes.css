@@ -1,0 +1,318 @@
+/* =============================================
+   THEME DEFINITIONS — CSS Custom Properties
+   ============================================= */
+
+/* Белая — дефолт, чистая светлая */
+:root,
+[data-theme="belaya"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-sider: #ffffff;
+    --bg-content: #f0f2f5;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-header: #ffffff;
+    --bg-hover: #f0f0f0;
+    --bg-table-row: #ffffff;
+    --bg-table-row-alt: #fafafa;
+    --bg-modal: #ffffff;
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a4a6a;
+    --text-muted: #8888a0;
+    --text-heading: #1a1a2e;
+    --accent: #dc2626;
+    --accent-hover: #ef4444;
+    --accent-subtle: rgba(220, 38, 38, 0.08);
+    --accent-border: rgba(220, 38, 38, 0.2);
+    --border: #e5e7eb;
+    --border-light: #d1d5db;
+    --shadow: rgba(0, 0, 0, 0.08);
+    --scrollbar-track: #f0f0f0;
+    --scrollbar-thumb: #c0c0c0;
+    --link: #dc2626;
+}
+
+/* Арктическая — холодная голубая */
+[data-theme="arctic-light"] {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #e8edf4;
+    --bg-sider: #f0f4f8;
+    --bg-content: #e2e8f0;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-header: #f0f4f8;
+    --bg-hover: #dce4ee;
+    --bg-table-row: #ffffff;
+    --bg-table-row-alt: #f5f7fa;
+    --bg-modal: #ffffff;
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --text-heading: #0f172a;
+    --accent: #0284c7;
+    --accent-hover: #0ea5e9;
+    --accent-subtle: rgba(2, 132, 199, 0.08);
+    --accent-border: rgba(2, 132, 199, 0.2);
+    --border: #cbd5e1;
+    --border-light: #b8c4d4;
+    --shadow: rgba(0, 0, 0, 0.06);
+    --scrollbar-track: #e8edf4;
+    --scrollbar-thumb: #a0b0c8;
+    --link: #0284c7;
+}
+
+/* Лавандовая — нежная фиолетовая */
+[data-theme="lavender"] {
+    --bg-primary: #f5f0ff;
+    --bg-secondary: #ede6fc;
+    --bg-sider: #f5f0ff;
+    --bg-content: #e8e0f8;
+    --bg-card: #ffffff;
+    --bg-input: #ffffff;
+    --bg-header: #f5f0ff;
+    --bg-hover: #ddd4f4;
+    --bg-table-row: #ffffff;
+    --bg-table-row-alt: #f8f4ff;
+    --bg-modal: #ffffff;
+    --text-primary: #1e1535;
+    --text-secondary: #4a3d6a;
+    --text-muted: #8878a8;
+    --text-heading: #1e1535;
+    --accent: #7c3aed;
+    --accent-hover: #8b5cf6;
+    --accent-subtle: rgba(124, 58, 237, 0.08);
+    --accent-border: rgba(124, 58, 237, 0.2);
+    --border: #ddd4f4;
+    --border-light: #ccc0ee;
+    --shadow: rgba(0, 0, 0, 0.06);
+    --scrollbar-track: #ede6fc;
+    --scrollbar-thumb: #b0a0d0;
+    --link: #7c3aed;
+}
+
+/* =============================================
+   GLOBAL STYLES
+   ============================================= */
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 4px;
+}
+
+body {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+    transition: background 0.3s, color 0.3s;
+}
+
+.ant-layout {
+    background: var(--bg-primary) !important;
+}
+
+.ant-layout-header {
+    background: var(--bg-header) !important;
+}
+
+.ant-layout-sider {
+    background: var(--bg-sider) !important;
+}
+
+.ant-layout-content {
+    background: var(--bg-content) !important;
+}
+
+.ant-menu {
+    background: var(--bg-sider) !important;
+    color: var(--text-secondary) !important;
+}
+
+.ant-menu-item-selected {
+    background: var(--accent-subtle) !important;
+    color: var(--accent) !important;
+}
+
+.ant-menu-item:hover {
+    background: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-menu-item {
+    color: var(--text-secondary) !important;
+}
+
+.ant-table {
+    background: var(--bg-card) !important;
+}
+
+.ant-table-thead > tr > th,
+.ant-table-thead > tr > td {
+    background: var(--bg-secondary) !important;
+    color: var(--text-heading) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.ant-table-tbody > tr > td {
+    border-bottom: 1px solid var(--border) !important;
+    background: var(--bg-table-row) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-table-tbody > tr:nth-child(even) > td {
+    background: var(--bg-table-row-alt) !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+    background: var(--bg-hover) !important;
+}
+
+.ant-table-bordered .ant-table-thead > tr > th,
+.ant-table-bordered .ant-table-tbody > tr > td {
+    border-right: 1px solid var(--border) !important;
+}
+
+.ant-modal-content {
+    background: var(--bg-modal) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.ant-modal-header {
+    background: var(--bg-modal) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.ant-modal-title {
+    color: var(--text-heading) !important;
+}
+
+.ant-modal-close-x {
+    color: var(--text-secondary) !important;
+}
+
+.ant-form-item-label > label {
+    color: var(--text-secondary) !important;
+}
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-picker,
+.ant-select-selector {
+    background: var(--bg-input) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-input:focus,
+.ant-input-focused,
+.ant-input-affix-wrapper-focused,
+.ant-picker-focused {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 2px var(--accent-subtle) !important;
+}
+
+.ant-btn-primary {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+.ant-btn-primary:hover {
+    background: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
+}
+
+.ant-btn-default {
+    background: var(--bg-input) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+}
+
+.ant-btn-default:hover {
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
+}
+
+.ant-btn-link {
+    color: var(--link) !important;
+}
+
+.ant-btn-link:hover {
+    color: var(--accent-hover) !important;
+}
+
+.ant-spin-dot-item {
+    background: var(--accent) !important;
+}
+
+.ant-spin-text {
+    color: var(--text-secondary) !important;
+}
+
+.ant-tag {
+    border-color: var(--border) !important;
+}
+
+.ant-dropdown-menu {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+}
+
+.ant-dropdown-menu-item:hover {
+    background: var(--bg-hover) !important;
+}
+
+.ant-dropdown-menu-item-selected {
+    background: var(--accent-subtle) !important;
+    color: var(--accent) !important;
+}
+
+.ant-title {
+    color: var(--text-heading) !important;
+}
+
+.theme-sider {
+    border-right: 1px solid var(--border) !important;
+}
+
+.theme-picker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.2s;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.theme-picker:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-border);
+}
+
+.theme-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ant-layout-sider {
+    border-right: 1px solid var(--border) !important;
+}

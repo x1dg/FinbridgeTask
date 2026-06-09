@@ -5,14 +5,18 @@ COPY Finbridge.slnx ./
 COPY Finbridge.Domain/Finbridge.Domain.csproj Finbridge.Domain/
 COPY Finbridge.Application/Finbridge.Application.csproj Finbridge.Application/
 COPY Finbridge.Data/Finbridge.Data.csproj Finbridge.Data/
+COPY Finbridge.Api/Finbridge.Api.csproj Finbridge.Api/
 COPY Finbridge.Backoffice/Finbridge.Backoffice.csproj Finbridge.Backoffice/
+COPY Finbridge.Tests/Finbridge.Tests.csproj Finbridge.Tests/
 
-RUN dotnet restore Finbridge.Backoffice/Finbridge.Backoffice.csproj
+RUN dotnet restore Finbridge.slnx
 
 COPY Finbridge.Domain/ Finbridge.Domain/
 COPY Finbridge.Application/ Finbridge.Application/
 COPY Finbridge.Data/ Finbridge.Data/
+COPY Finbridge.Api/ Finbridge.Api/
 COPY Finbridge.Backoffice/ Finbridge.Backoffice/
+COPY Finbridge.Tests/ Finbridge.Tests/
 
 RUN dotnet publish Finbridge.Backoffice/Finbridge.Backoffice.csproj \
     -c Release \

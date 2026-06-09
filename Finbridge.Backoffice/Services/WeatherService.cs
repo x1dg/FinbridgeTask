@@ -68,7 +68,7 @@ public sealed record WeatherInfo(
     public string MoonDisplay => DaysUntilFullMoon switch
     {
         < 1 => "Полнолуние сегодня 🌕",
-        < 1.5 => "Полнолуние tonight 🌕",
+        < 1.5 => "Полнолуние сегодня вечером 🌕",
         < 2 => "Завтра полнолуние 🌕",
         _ => $"Полнолуние через {DaysUntilFullMoon:0} дн."
     };
