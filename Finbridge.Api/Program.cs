@@ -45,6 +45,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         [new OpenApiSecuritySchemeReference("Bearer", null)] = new List<string>()
     });
+    c.OperationFilter<Swashbuckle.AspNetCore.SwaggerGen.SecurityRequirementsOperationFilter>();
 });
 
 builder.Services.Configure<BalanceSettings>(builder.Configuration.GetSection("BalanceSettings"));
